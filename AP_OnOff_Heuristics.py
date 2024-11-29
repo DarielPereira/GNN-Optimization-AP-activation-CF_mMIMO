@@ -7,9 +7,8 @@ import numpy as np
 import torch as th
 import random
 
-from functionsAllocation import PilotAssignment, AP_GeneratingSamples
+from functionsAllocation import PilotAssignment, AP_OnOff_GlobalHeuristics
 from functionsSetup import generateSetup
-from functionsGraphHandling import SampleBuffer, get_AP2UE_edges, get_Pilot2UE_edges, get_oneHot_bestPilot
 from functionsChannelEstimates import channelEstimates
 
 
@@ -28,11 +27,9 @@ configuration = {
     'p': 100,                     # uplink transmit power per UE in mW
     'cell_side': 1000,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
-    'M': int(7),                  # number of potential APs to include in the graph
-    'I': int(3),                  # number of relevant UEs to include in the graph
-    'comb_mode': 'MR',           # combining method used to evaluate optimization
-    'potentialAPs_mode': 'base', # mode used to select the potential APs
-    'relevantUEs_mode': 'base'   # mode used to select the relevant UEs
+    'comb_mode': 'MMSE',           # combining method used to evaluate optimization
+    'heuristic_mode': 'sequential_greedy'   # heuristic mode used to solve the optimization
+                                            # ['exhaustive_search', 'sequential_greedy']
     }
 
 print('### CONFIGURATION PARAMETERS ###')
@@ -52,14 +49,8 @@ tau_p = configuration['tau_p']
 p = configuration['p']
 cell_side = configuration['cell_side']
 ASD_varphi = configuration['ASD_varphi']
-M = configuration['M']
-I = configuration['I']
 comb_mode = configuration['comb_mode']
-potentialAPs_mode = configuration['potentialAPs_mode']
-relevantUEs_mode = configuration['relevantUEs_mode']
-
-# Create the sample storage buffer
-sampleBuffer = SampleBuffer(batch_size=10)
+heuristic_mode = configuration['heuristic_mode']
 
 # Run over all the setups
 for setup_iter in range(nbrOfSetups):
@@ -72,8 +63,8 @@ for setup_iter in range(nbrOfSetups):
     print(f'Generating setup {setup_iter+1}/{nbrOfSetups} with {K} connected UEs......')
 
     # Generate one setup with UEs and APs at random locations
-    gainOverNoisedB, distances, R, APpositions, UEpositions = (
-        generateSetup(L, K, N, T, cell_side, ASD_varphi, seed=setup_iter+nbrOfSetups))
+    gainOverNoisedB, distances, R, APpositions, UEpositions, M = (
+        generateSetup(L, K, N, T, cell_side, ASD_varphi, seed=setup_iter+nbrOfSetups+2))
 
     # Compute AP and pilot assignment
     pilotIndex = PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode='DCC')
@@ -81,14 +72,15 @@ for setup_iter in range(nbrOfSetups):
     # Generate channel realizations with estimates and estimation error matrices
     Hhat, H, B, C = channelEstimates(R, nbrOfRealizations, L, K, N, tau_p, pilotIndex, p)
 
-    sampleBuffer = AP_GeneratingSamples(sampleBuffer, p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat, H,
-                                        B, C, L, K, N, M, I,
-                   comb_mode, potentialAPs_mode, relevantUEs_mode)
+    best_APstate, best_sum_SE, best_SEs = AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat,
+                                             H, B, C, L, K, N, Q, M,
+                   comb_mode, heuristic_mode)
 
-file_name = (
-f'./AP_TRAININGDATA/newData/SE_Comb_'
-+comb_mode+f'_L_{L}_N_{N}_M_{M}_I_{I}_taup_{tau_p}_NbrSamp_{len(sampleBuffer.storage)}.pkl')
 
-sampleBuffer.save(file_name)
+    # Print the results
+    print(f'Best AP state: {best_APstate}')
+    print(f'Best sum SE: {best_sum_SE}')
+    print(f'Best SEs: {best_SEs}')
+
 
 

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import random
 import math
 
-def functionComputeSE_uplink(Hhat, H, D, C, tau_c, tau_p, nbrOfRealizations, N, K, L, p):
+def functionComputeSE_uplink(Hhat, H, D, AP_state, C, tau_c, tau_p, nbrOfRealizations, N, K, L, p):
     """Compute uplink SE for different receive combining schemes using the capacity bound in Theorem 5.1
     for the centralized scheme and the capacity bound in Theorem  5.4 for the distributed schemes. Compute
     the genie-aided uplink SE from Corollary 5.9 for the centralized operation and 5.10 for ths distributed one.
@@ -56,7 +56,8 @@ def functionComputeSE_uplink(Hhat, H, D, C, tau_c, tau_p, nbrOfRealizations, N, 
     # Store the N x N identity matrix
     eyeN = np.identity(N)
 
-
+    # Update D according the AP state
+    D = np.diag(AP_state) @ D
 
     # Compute the prelog factor assuming only uplink data transmission
     prelogFactor = math.ceil((tau_c-tau_p)/3)/tau_c
@@ -97,10 +98,8 @@ def functionComputeSE_uplink(Hhat, H, D, C, tau_c, tau_p, nbrOfRealizations, N, 
                     Hallj_active[l*N:(l+1)*N, :] = H[servingAPs[l]*N:(servingAPs[l]+1)*N, n, :].reshape(N, K)
                     Hhatallj_active[l * N:(l + 1) * N, :] = Hhat[servingAPs[l] * N:(servingAPs[l] + 1) * N, n, :].reshape(N, K)
                     C_tot_blk[l * N: (l+1) * N, l * N: (l+1) * N] = np.sum(C[:, :, servingAPs[l], :], 2)
-                    # # Use this when working with global CSI and knowledge about the AP assignment of some UEs
-                    # C_tot_blk_partial[l * N: (l + 1) * N, l * N: (l + 1) * N] = np.sum(C[:, :, servingAPs[l], servedUEs], 2)
-                    # Use this when working with local CSI and no knowledge about the AP assignment of the UEs
-                    C_tot_blk_partial[l * N: (l + 1) * N, l * N: (l + 1) * N] = np.sum(C[:, :, servingAPs[l], :], 2)
+                    # Use this when working with global CSI and knowledge about the AP assignment of some UEs
+                    C_tot_blk_partial[l * N: (l + 1) * N, l * N: (l + 1) * N] = np.sum(C[:, :, servingAPs[l], servedUEs], 2)
 
                 # Compute MMSE combining according to 5.11
                 v = p * (alg.inv(p * (Hhatallj_active @ Hhatallj_active.conjugate().T) +
@@ -117,14 +116,9 @@ def functionComputeSE_uplink(Hhat, H, D, C, tau_c, tau_p, nbrOfRealizations, N, 
 
 
                 # Compute P-RZF combining according to 5.18
-                # # Use this when working with global CSI and knowledge about the AP assignment of some UEs
-                # v = p * (alg.inv(
-                #     p * (Hhatallj_active[:, servedUEs] @ Hhatallj_active[:, servedUEs].conjugate().T) + np.identity(
-                #         La * N)) @ Hhatallj_active[:, k])
-
-                # Use this when working with local CSI and no knowledge about the AP assignment of the UEs
+                # Use this when working with global CSI and knowledge about the AP assignment of some UEs
                 v = p * (alg.inv(
-                    p * (Hhatallj_active @ Hhatallj_active.conjugate().T) + np.identity(
+                    p * (Hhatallj_active[:, servedUEs] @ Hhatallj_active[:, servedUEs].conjugate().T) + np.identity(
                         La * N)) @ Hhatallj_active[:, k])
 
                 # Compute numerator and denominator of instantaneous SINR in 5.5
@@ -154,12 +148,8 @@ def functionComputeSE_uplink(Hhat, H, D, C, tau_c, tau_p, nbrOfRealizations, N, 
 
 
                 # Compute P-MMSE combining according 5.16
-                # # Use this when working with global CSI and knowledge about the AP assignment of some UEs
-                # v = p * (alg.inv(p * (Hhatallj_active[:, servedUEs] @ Hhatallj_active[:, servedUEs].conjugate().T) +
-                #                  p * C_tot_blk_partial + np.identity(La * N)) @ Hhatallj_active[:, k])
-
-                # Use this when working with local CSI and no knowledge about the AP assignment of the UEs
-                v = p * (alg.inv(p * (Hhatallj_active @ Hhatallj_active.conjugate().T) +
+                # Use this when working with global CSI and knowledge about the AP assignment of some UEs
+                v = p * (alg.inv(p * (Hhatallj_active[:, servedUEs] @ Hhatallj_active[:, servedUEs].conjugate().T) +
                                  p * C_tot_blk_partial + np.identity(La * N)) @ Hhatallj_active[:, k])
 
                 # Compute numerator and denominator of instantaneous SINR in 5.5
