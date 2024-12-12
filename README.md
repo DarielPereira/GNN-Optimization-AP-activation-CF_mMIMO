@@ -10,11 +10,26 @@
                 - 'exhaustive_search': the exhaustive search method (only feasible in setups with reduced number of APs).
                 - 'sequential_greedy': incude an AP greedily in each step.
 
+    # 20241212: 
+        # Added:
+            # Include the function AP_OnOff_GlobalHeuristics() in functionsAPAllocation.py to implement the global 
+            heuristic methods:
+                - 'best_individualAPs': select the best AP according the their individual performance.
+                - 'local_ES': perform the exhaustive search locally for the APs in each CPU.
+                - 'local_SG': perform the sequential greedy locally for the APs in each CPU.
+                - 'Q_random': select Q APs randomly for each CPU.
+                - 'succesive_local_ES': perform the local exhaustive search for the APs in each CPU in a successive way, 
+                i.e., when evaluating each CPU we use the information from previous CPUs.
+                - 'succesive_local_SG': perform the local sequential greedy for the APs in each CPU in a successive way,    
+                i.e., when evaluating each CPU we use the information from previous CPUs.
+            # Improved the efficiency of the exhaustive search method, by considering only the AP assignments that use 
+            the maximum number of APs in each CPU.
+
 
     # To do:
         # Adapt the system model for the AP on/off optimization problem (Done).
         # Implement the sequential greedy AP on/off (Done).
-        # Study the independece of the AP on/off. Is sequential always optimal?
+        # Study the independece of the AP on/off. Is sequential always optimal? -> NO (Done).
 
 
 

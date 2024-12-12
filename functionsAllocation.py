@@ -1,18 +1,7 @@
 import numpy as np
 import itertools
-import numpy.linalg as linalg
-import sympy as sp
-import scipy.linalg as spalg
-import matplotlib.pyplot as plt
-import random
-import math
 
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler
-
-from functionsUtils import db2pow, localScatteringR, correlationNormalized_grid
-from functionsChannelEstimates import channelEstimates
+from functionsUtils import db2pow, binary_combinations
 from functionsComputeSE_uplink import functionComputeSE_uplink
 
 
@@ -78,7 +67,10 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
         case 'exhaustive_search':
 
             # compute all the feasible AP state vectors
-            feasible_APstates = np.array(list(itertools.product([0, 1], repeat=L)))
+            # feasible_APstates = np.array(list(itertools.product([0, 1], repeat=L)))
+
+            # Compute the feasible AP state vectors that consider the maximum number of active APs
+            feasible_APstates = binary_combinations(L, Q*M.shape[0])
 
             # Compute the valid AP state vectors
             valid_APstates = []
@@ -115,7 +107,7 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
                     case 'P_MMSE':
                         SE = SE_P_MMSE
                     case _:
-                        print('ERROR: Combining mismatching')
+                        print('ERROR: Combining mode mismatching')
                         SE = 0
 
                 sum_SE = np.sum(SE)
@@ -131,6 +123,7 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
 
             # Get the best individual SEs
             best_SEs = SEs[np.argmax(sum_SEs), :]
+
         case 'sequential_greedy':
 
             # Compute all the feasible 1-AP state vectors
@@ -142,7 +135,7 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
             # Stop when no other AP can be added
             while sum(best_APstate) < M.shape[0]*Q:
 
-                best_sum_SE = 0
+                sum_SEs = []
 
                 # Try to add an AP from those that have not been used
                 for APstate_toAdd in unused_feasible_1AP_states:
@@ -174,17 +167,18 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
                             case 'P_MMSE':
                                 SE = SE_P_MMSE
                             case _:
-                                print('ERROR: Combining mismatching')
+                                print('ERROR: Combining mode mismatching')
                                 SE = 0
 
                         sum_SE = np.sum(SE)
 
-                        if sum_SE > best_sum_SE:
-                            best_sum_SE = sum_SE
-                            best_APstate_toAdd = APstate_toAdd
+                        sum_SEs.append((sum_SE, APstate_toAdd))
 
+                if len(sum_SEs) == 0:
+                    break
                 # Update the best AP state
-                best_APstate = best_APstate + best_APstate_toAdd
+                best_APstate_toAdd = max(sum_SEs, key= lambda x: x[0])[1]
+                best_APstate += best_APstate_toAdd
 
                 # Remove the best AP state from the unused feasible 1-AP states
                 # Find the index of the array to remove
@@ -211,11 +205,476 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
                 case 'P_MMSE':
                     SE = SE_P_MMSE
                 case _:
-                    print('ERROR: Combining mismatching')
+                    print('ERROR: Combining mode mismatching')
                     SE = 0
 
             best_sum_SE = np.sum(SE)
             best_SEs = SE.flatten()
+
+        case 'best_individualAPs':
+
+            # Compute all the feasible 1-AP state vectors
+            feasible_1AP_states = list(np.eye(L, dtype=int))
+
+            # To store sum-SE values and the corresponding AP states
+            sum_SEs = np.zeros((L))
+
+            # Run over the AP states
+            for idx, APstate in enumerate(feasible_1AP_states):
+
+                # D vector common to all the UEs
+                D = np.ones((L, K))
+
+                # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+                SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, APstate, C, tau_c, tau_p,
+                                                                               nbrOfRealizations, N, K, L, p)
+
+                match comb_mode:
+                    case 'MMSE':
+                        SE = SE_MMSE
+                    case 'P_RZF':
+                        SE = SE_P_RZF
+                    case 'MR':
+                        SE = SE_MR
+                    case 'P_MMSE':
+                        SE = SE_P_MMSE
+                    case _:
+                        print('ERROR: Combining mode mismatching')
+                        SE = 0
+
+                sum_SE = np.sum(SE)
+
+                sum_SEs[idx] = sum_SE
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Find the best AP state
+            for c in range(M.shape[0]):
+                filtered_sum_SEs = np.array(sum_SEs)
+                filtered_sum_SEs[np.where(M[c, :]!=1)[0]] = 0
+                indices = np.argsort(filtered_sum_SEs)[-Q:]
+                best_APstate[indices] = 1
+
+            # D vector common to all the UEs
+            D = np.ones((L, K))
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case 'local_ES':
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Run over the CPUs
+            for c in range(M.shape[0]):
+                # D vector common to all the UEs
+                D = np.ones((L, K))
+
+                # number of APs connected to CPU c
+                T_c = sum(M[c, :])
+
+                # Compute all the feasible combinations with exactly Q APs
+                feasible_reduced_APstates = binary_combinations(T_c, Q)
+
+                if len(feasible_reduced_APstates) == 0:
+                    continue
+
+                # To store the sum-SE values
+                sum_SEs = np.zeros((len(feasible_reduced_APstates)))
+
+                # To store the individual SE values
+                SEs = np.zeros((len(feasible_reduced_APstates), K))
+
+                # Try each valid AP state:
+                for idx, reduced_APstate in enumerate(feasible_reduced_APstates):
+
+                    APstate = np.zeros((L))
+                    APstate[M[c, :]==1] = reduced_APstate
+
+                    # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+                    SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, APstate, C, tau_c, tau_p,
+                                                                                   nbrOfRealizations, N, K, L, p)
+
+                    match comb_mode:
+                        case 'MMSE':
+                            SE = SE_MMSE
+                        case 'P_RZF':
+                            SE = SE_P_RZF
+                        case 'MR':
+                            SE = SE_MR
+                        case 'P_MMSE':
+                            SE = SE_P_MMSE
+                        case _:
+                            print('ERROR: Combining mode mismatching')
+                            SE = 0
+
+                    sum_SE = np.sum(SE)
+
+                    sum_SEs[idx] = sum_SE
+                    SEs[idx, :] = SE.flatten()
+
+                # Find the best AP state
+                best_APstate[M[c, :]==1] = feasible_reduced_APstates[np.argmax(sum_SEs)]
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case 'local_SG':
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Run over the CPUs
+            for c in range(M.shape[0]):
+                # D vector common to all the UEs
+                D = np.ones((L, K))
+
+                # number of APs connected to CPU c
+                T_c = sum(M[c, :])
+
+                # Compute all the feasible 1-AP state vectors
+                unused_feasible_1AP_states = list(np.eye(T_c, dtype=int))
+
+                # To store best AP state
+                local_best_APstate = np.zeros((T_c), int)
+
+                # Stop when no other AP can be added
+                while sum(local_best_APstate) < Q:
+
+                    sum_SEs = []
+
+                    # Try to add an AP from those that have not been used
+                    for APstate_toAdd in unused_feasible_1AP_states:
+
+                        APstate = np.zeros((L))
+                        APstate[M[c, :]==1] = local_best_APstate + APstate_toAdd
+
+                        # D vector common to all the UEs
+                        D = np.ones((L, K))
+
+                        # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+                        SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, APstate, C, tau_c, tau_p,
+                                                                                       nbrOfRealizations, N, K, L, p)
+
+                        match comb_mode:
+                            case 'MMSE':
+                                SE = SE_MMSE
+                            case 'P_RZF':
+                                SE = SE_P_RZF
+                            case 'MR':
+                                SE = SE_MR
+                            case 'P_MMSE':
+                                SE = SE_P_MMSE
+                            case _:
+                                print('ERROR: Combining mode mismatching')
+                                SE = 0
+
+                        sum_SE = np.sum(SE)
+
+                        sum_SEs.append((sum_SE, APstate_toAdd))
+
+                    if len(sum_SEs) == 0:
+                        break
+
+                    # Update the best AP state
+                    best_APstate_toAdd = max(sum_SEs, key= lambda x: x[0])[1]
+                    local_best_APstate += best_APstate_toAdd
+
+                    # Remove the best AP state from the unused feasible 1-AP states
+                    # Find the index of the array to remove
+                    index_to_remove = next(i for i, state in enumerate(unused_feasible_1AP_states) if
+                                           np.array_equal(state, best_APstate_toAdd))
+
+                    # Remove the array using the index
+                    unused_feasible_1AP_states.pop(index_to_remove)
+
+                # update the best local AP state in the global AP state
+                best_APstate[M[c, :]==1] = local_best_APstate
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case 'Q_random':
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Run over the CPUs
+            for c in range(M.shape[0]):
+
+                # Get the APs connected to the CPU c
+                connected_APs = np.where(M[c, :]==1)[0]
+
+                # Randomly select Q APs
+                selected_APs = np.random.choice(connected_APs, min(Q,len(connected_APs)) , replace=False)
+
+                # Update the best AP state
+                best_APstate[selected_APs] = 1
+
+            # Check if the best AP state is valid
+            valid = True
+            for idx in range(M.shape[0]):
+                if M[idx, :] @ best_APstate > Q:
+                    valid = False
+
+            if not valid:
+                print('ERROR: Invalid AP state')
+
+            # D vector common to all the UEs
+            D = np.ones((L, K))
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case 'successive_local_SG':
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Run over the CPUs
+            for c in range(M.shape[0]):
+                # D vector common to all the UEs
+                D = np.ones((L, K))
+
+                # number of APs connected to CPU c
+                T_c = sum(M[c, :])
+
+                # Compute all the feasible 1-AP state vectors
+                unused_feasible_1AP_states = list(np.eye(T_c, dtype=int))
+
+                # To store best AP state
+                local_best_APstate = np.zeros((T_c), int)
+
+                # Stop when no other AP can be added
+                while sum(local_best_APstate) < Q:
+
+                    sum_SEs = []
+
+                    # Try to add an AP from those that have not been used
+                    for APstate_toAdd in unused_feasible_1AP_states:
+
+                        APstate = best_APstate
+
+                        APstate[M[c, :] == 1] = local_best_APstate + APstate_toAdd
+
+                        # D vector common to all the UEs
+                        D = np.ones((L, K))
+
+                        # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+                        SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, APstate, C, tau_c,
+                                                                                       tau_p,
+                                                                                       nbrOfRealizations, N, K, L, p)
+
+                        match comb_mode:
+                            case 'MMSE':
+                                SE = SE_MMSE
+                            case 'P_RZF':
+                                SE = SE_P_RZF
+                            case 'MR':
+                                SE = SE_MR
+                            case 'P_MMSE':
+                                SE = SE_P_MMSE
+                            case _:
+                                print('ERROR: Combining mode mismatching')
+                                SE = 0
+
+                        sum_SE = np.sum(SE)
+
+                        sum_SEs.append((sum_SE, APstate_toAdd))
+
+                    if len(sum_SEs) == 0:
+                        break
+
+                    # Update the best AP state
+                    best_APstate_toAdd = max(sum_SEs, key=lambda x: x[0])[1]
+                    local_best_APstate += best_APstate_toAdd
+
+                    # Remove the best AP state from the unused feasible 1-AP states
+                    # Find the index of the array to remove
+                    index_to_remove = next(i for i, state in enumerate(unused_feasible_1AP_states) if
+                                           np.array_equal(state, best_APstate_toAdd))
+
+                    # Remove the array using the index
+                    unused_feasible_1AP_states.pop(index_to_remove)
+
+                # update the best local AP state in the global AP state
+                best_APstate[M[c, :] == 1] = local_best_APstate
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case 'successive_local_ES':
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Run over the CPUs
+            for c in range(M.shape[0]):
+                # D vector common to all the UEs
+                D = np.ones((L, K))
+
+                # number of APs connected to CPU c
+                T_c = sum(M[c, :])
+
+                # Compute all the feasible combinations with exactly Q APs
+                feasible_reduced_APstates = binary_combinations(T_c, Q)
+
+                if len(feasible_reduced_APstates) == 0:
+                    continue
+
+                # To store the sum-SE values
+                sum_SEs = np.zeros((len(feasible_reduced_APstates)))
+
+                # To store the individual SE values
+                SEs = np.zeros((len(feasible_reduced_APstates), K))
+
+                # Try each valid AP state:
+                for idx, reduced_APstate in enumerate(feasible_reduced_APstates):
+
+                    APstate = best_APstate
+                    APstate[M[c, :] == 1] = reduced_APstate
+
+                    # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+                    SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, APstate, C, tau_c, tau_p,
+                                                                                   nbrOfRealizations, N, K, L, p)
+
+                    match comb_mode:
+                        case 'MMSE':
+                            SE = SE_MMSE
+                        case 'P_RZF':
+                            SE = SE_P_RZF
+                        case 'MR':
+                            SE = SE_MR
+                        case 'P_MMSE':
+                            SE = SE_P_MMSE
+                        case _:
+                            print('ERROR: Combining mode mismatching')
+                            SE = 0
+
+                    sum_SE = np.sum(SE)
+
+                    sum_SEs[idx] = sum_SE
+                    SEs[idx, :] = SE.flatten()
+
+                # Find the best AP state
+                best_APstate[M[c, :] == 1] = feasible_reduced_APstates[np.argmax(sum_SEs)]
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case _:
+            print('ERROR: Heuristic mode mismatching')
+
+
 
     return best_APstate, best_sum_SE, best_SEs
 

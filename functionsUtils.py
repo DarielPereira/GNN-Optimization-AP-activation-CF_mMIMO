@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from itertools import product
 import plotly.express as px
 import pickle
+import itertools
+
 
 def db2pow(dB):
     """return the power values that correspond to the input dB values
@@ -138,3 +140,17 @@ def load_results(filename):
     with open(filename, 'rb') as inp:
         results = pickle.load(inp)
     return results
+
+
+def binary_combinations(M, Q):
+    # Generate all possible combinations of Q ones in an array of length M
+    positions = itertools.combinations(range(M), Q)
+
+    # Create binary vectors
+    result = []
+    for pos in positions:
+        vector = [0] * M  # Start with all zeros
+        for p in pos:
+            vector[p] = 1  # Place ones at the chosen positions
+        result.append(vector)
+    return result

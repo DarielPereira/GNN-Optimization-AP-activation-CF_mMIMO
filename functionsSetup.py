@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.linalg as alg
 import math
+from sklearn.cluster import KMeans
 
 from functionsUtils import db2pow, localScatteringR, drawingSetup, drawing3Dvectors
 # from functionsClustering_PilotAlloc import pilotAssignment, drawPilotAssignment
@@ -52,20 +53,39 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
 
     AP_spacing = squarelength/(L**0.5)
 
-    # M matrix stores the connections between the APs and the CPUs
-    nbrOfCPUs = math.ceil(L/T)
-    M = np.zeros((nbrOfCPUs, L), dtype=int)
-    for i in range(nbrOfCPUs):
-        for j in range(L):
-            if (j)//T == i:
-                M[i, j] = 1
-
     # Regular AP deployment
     APpositions = []
     for i in np.linspace(AP_spacing/2, squarelength - AP_spacing/2, int(L**0.5)):
         for j in np.linspace(AP_spacing/2, squarelength - AP_spacing/2, int(L**0.5)):
-            APpositions.append(complex(i, j) + complex(20*np.random.randn(1)[0], 20*np.random.randn(1)[0]))
+            APpositions.append(complex(i, j) + complex((squarelength/50)*np.random.randn(1)[0], (squarelength/50)*np.random.randn(1)[0]))
     APpositions = np.array(APpositions).reshape(-1, 1)
+
+    # M matrix stores the connections between the APs and the CPUs
+    nbrOfCPUs = math.ceil(L / T)
+    M = np.zeros((nbrOfCPUs, L), dtype=int)
+
+    # Clustering mode
+    clusteringMode = 'Kbeams'
+
+    if clusteringMode == 'sequential':
+        for i in range(nbrOfCPUs):
+            for j in range(L):
+                if (j) // T == i:
+                    M[i, j] = 1
+
+    elif clusteringMode == 'Kbeams':
+        # Convert complex numbers to 2D (real and imaginary parts)
+        data = np.column_stack((APpositions.real, APpositions.imag))
+
+        # Apply k-means clustering
+        num_clusters = nbrOfCPUs  # Choose the number of clusters
+        kmeans = KMeans(n_clusters=num_clusters, random_state=0)
+        kmeans.fit(data)
+
+        # Cluster centers and labels
+        labels = kmeans.labels_
+        for l in range(L):
+            M[labels[l], l] = 1
 
     # To save the results
     gainOverNoisedB = np.zeros((L, K))
@@ -89,7 +109,7 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
         UEpositions[k] = UEposition
 
     # setup map
-    drawingSetup(UEpositions, APpositions, np.zeros((K), dtype=int), title="Setup Map", squarelength=squarelength)
+    # drawingSetup(UEpositions, APpositions, np.zeros((K), dtype=int), title="Setup Map", squarelength=squarelength)
 
 
     # Compute correlation matrices

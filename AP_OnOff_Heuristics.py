@@ -15,21 +15,23 @@ from functionsChannelEstimates import channelEstimates
 
 ##Setting Parameters
 configuration = {
-    'nbrOfSetups': 1,             # number of communication network setups
+    'nbrOfSetups': 10,             # number of communication network setups
     'nbrOfConnectedUEs_range': [1, 150],            # number of UEs to insert
     'nbrOfRealizations': 5,      # number of channel realizations per sample
     'L': 16,                     # number of APs
     'N': 1,                       # number of antennas per AP
-    'Q': 4,                       # max number of APs served by each CPU
-    'T': 8,                       # number of APs connected to each CPU
+    'Q': 3,                       # max number of APs served by each CPU
+    'T': 4,                       # number of APs connected to each CPU
     'tau_c': 400,                 # length of the coherence block
     'tau_p': 150,                  # length of the pilot sequences
     'p': 100,                     # uplink transmit power per UE in mW
-    'cell_side': 1000,            # side of the square cell in m
+    'cell_side': 200,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
-    'heuristic_mode': 'sequential_greedy'   # heuristic mode used to solve the optimization
-                                            # ['exhaustive_search', 'sequential_greedy']
+    'heuristic_mode': 'exhaustive_search'   # heuristic mode used to solve the optimization
+                                            # ['exhaustive_search', 'sequential_greedy', 'best_individualAPs',
+                                            # 'local_ES', 'local_SG', 'Q_random', 'successive_local_SG',
+                                            # 'successive_local_ES']
     }
 
 print('### CONFIGURATION PARAMETERS ###')
@@ -52,6 +54,12 @@ ASD_varphi = configuration['ASD_varphi']
 comb_mode = configuration['comb_mode']
 heuristic_mode = configuration['heuristic_mode']
 
+# To store the sum-SE values for each setup
+sum_SEs = np.zeros(nbrOfSetups)
+
+# To store the AP states for each setup
+AP_states = []
+
 # Run over all the setups
 for setup_iter in range(nbrOfSetups):
 
@@ -64,7 +72,7 @@ for setup_iter in range(nbrOfSetups):
 
     # Generate one setup with UEs and APs at random locations
     gainOverNoisedB, distances, R, APpositions, UEpositions, M = (
-        generateSetup(L, K, N, T, cell_side, ASD_varphi, seed=setup_iter+nbrOfSetups+2))
+        generateSetup(L, K, N, T, cell_side, ASD_varphi, seed=setup_iter+100))
 
     # Compute AP and pilot assignment
     pilotIndex = PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode='DCC')
@@ -81,6 +89,14 @@ for setup_iter in range(nbrOfSetups):
     print(f'Best AP state: {best_APstate}')
     print(f'Best sum SE: {best_sum_SE}')
     print(f'Best SEs: {best_SEs}')
+
+    # Store the sum-SE values
+    sum_SEs[setup_iter] = best_sum_SE
+
+    # Store the AP states
+    AP_states.append(best_APstate)
+
+
 
 
 
