@@ -64,6 +64,44 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
     """
 
     match heuristic_mode:
+        case 'bestgains_individualAPs':
+            ave_gainOverNoisedB = np.mean(gainOverNoisedB, axis=1)
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Find the best AP state
+            for c in range(M.shape[0]):
+                filtered_ave_gainOverNoisedB = np.array(ave_gainOverNoisedB)
+                filtered_ave_gainOverNoisedB[np.where(M[c, :] != 1)[0]] = float('-inf')
+                indices = np.argsort(filtered_ave_gainOverNoisedB)[-Q:]
+                best_APstate[indices] = 1
+
+            # D vector common to all the UEs
+            D = np.ones((L, K))
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+
         case 'exhaustive_search':
 
             # compute all the feasible AP state vectors

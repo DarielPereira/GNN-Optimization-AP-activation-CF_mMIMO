@@ -17,21 +17,21 @@ from functionsChannelEstimates import channelEstimates
 configuration = {
     'nbrOfSetups': 10,             # number of communication network setups
     'nbrOfConnectedUEs_range': [1, 150],            # number of UEs to insert
-    'nbrOfRealizations': 5,      # number of channel realizations per sample
-    'L': 16,                     # number of APs
-    'N': 1,                       # number of antennas per AP
-    'Q': 3,                       # max number of APs served by each CPU
-    'T': 4,                       # number of APs connected to each CPU
+    'nbrOfRealizations': 2,      # number of channel realizations per sample
+    'L': 100,                     # number of APs
+    'N': 4,                       # number of antennas per AP
+    'Q': 4,                       # max number of APs served by each CPU
+    'T': 8,                       # number of APs connected to each CPU
     'tau_c': 400,                 # length of the coherence block
     'tau_p': 150,                  # length of the pilot sequences
     'p': 100,                     # uplink transmit power per UE in mW
-    'cell_side': 200,            # side of the square cell in m
+    'cell_side': 1000,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
-    'heuristic_mode': 'exhaustive_search'   # heuristic mode used to solve the optimization
+    'heuristic_mode': 'bestgains_individualAPs'   # heuristic mode used to solve the optimization
                                             # ['exhaustive_search', 'sequential_greedy', 'best_individualAPs',
                                             # 'local_ES', 'local_SG', 'Q_random', 'successive_local_SG',
-                                            # 'successive_local_ES']
+                                            # 'successive_local_ES', 'bestgains_individualAPs']
     }
 
 print('### CONFIGURATION PARAMETERS ###')
@@ -66,7 +66,7 @@ for setup_iter in range(nbrOfSetups):
     # sample the number of connected UEs from a uniform distribution in the specified range (nbrOfConnectedUEs_range)
     # random.seed(setup_iter+nbrOfSetups)
     # K = random.randint(nbrOfConnectedUEs_range[0], nbrOfConnectedUEs_range[1])
-    K = 4
+    K = 50
 
     print(f'Generating setup {setup_iter+1}/{nbrOfSetups} with {K} connected UEs......')
 

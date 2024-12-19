@@ -109,7 +109,7 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
         UEpositions[k] = UEposition
 
     # setup map
-    # drawingSetup(UEpositions, APpositions, np.zeros((K), dtype=int), title="Setup Map", squarelength=squarelength)
+    drawingSetup(UEpositions, APpositions, np.zeros((K), dtype=int), title="Setup Map", squarelength=squarelength)
 
 
     # Compute correlation matrices

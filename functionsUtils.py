@@ -93,13 +93,13 @@ def drawingSetup(UEpositions, APpositions, colorIndex, title, squarelength):
     plt.scatter(UEpositions.real, UEpositions.imag, c=custom_colors[colorIndex], marker='*', s=24)
     plt.scatter(APpositions.real, APpositions.imag, c='orange', marker='^', s=18)
     plt.title(title)
-    for i, txt in enumerate(range(len(UEpositions))):
-        plt.annotate(txt, (UEpositions[i].real, UEpositions[i].imag), fontsize=12)
-    for i, txt in enumerate(range(len(APpositions))):
-        plt.annotate(txt, (APpositions[i].real, APpositions[i].imag), fontsize=12, c='mediumblue')
+    # for i, txt in enumerate(range(len(UEpositions))):
+    #     plt.annotate(txt, (UEpositions[i].real, UEpositions[i].imag), fontsize=12)
+    # for i, txt in enumerate(range(len(APpositions))):
+    #     plt.annotate(txt, (APpositions[i].real, APpositions[i].imag), fontsize=12, c='mediumblue')
     plt.xlim([0, squarelength+20])
     plt.ylim([0, squarelength+20])
-    plt.legend(['UEs', 'APs'])
+    plt.legend(['UEs', 'APs'], loc='upper right', framealpha=1)
     plt.xlabel(r'position [m]', size=15)
     plt.ylabel(r'position [m]', size=15)
     plt.rc('text', usetex=True)

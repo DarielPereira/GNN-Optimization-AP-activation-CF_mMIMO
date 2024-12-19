@@ -25,6 +25,12 @@
             # Improved the efficiency of the exhaustive search method, by considering only the AP assignments that use 
             the maximum number of APs in each CPU.
 
+    # 20241219:
+        # Added:
+            # Update the function AP_OnOff_GlobalHeuristics() with the following heuristics:
+                - 'bestgains_individualAPs': select the best AP according the their individual average channel gains 
+                (average over all the users).
+
 
     # To do:
         # Adapt the system model for the AP on/off optimization problem (Done).
