@@ -31,11 +31,21 @@
                 - 'bestgains_individualAPs': select the best AP according the their individual average channel gains 
                 (average over all the users).
 
+    # 20241220:
+        # Added:
+            # We include the script AP_OnOff_SampleGeneration.py to generate the samples for training the GNNs for 
+            the AP on/off task. The training data is stored in the folder //AP_trainingData/newData. Data is moved to 
+            folder .../inDataSet at the beginning of the script AP_training.
+            # We include the script AP_training.py to train the GNNs for the AP on/off task. 
+            # We modify the methods in the script functionsGraphHandling.py to handle the new data format for the AP 
+            on/off task.
+
 
     # To do:
         # Adapt the system model for the AP on/off optimization problem (Done).
         # Implement the sequential greedy AP on/off (Done).
         # Study the independece of the AP on/off. Is sequential always optimal? -> NO (Done).
+        # Test the training of the GNNs for the AP on/off task <===
 
 
 

@@ -1,36 +1,45 @@
+import torch
 import torch as th
 from collections import deque
 import random
 import numpy as np
 import pickle
-# import torch
-from torch_geometric.data import InMemoryDataset, Data, DataLoader
-from torch_geometric.nn import GCNConv
-import torch.nn.functional as F
+
+from torch_geometric.data import Dataset, Data, DataLoader
+from torch_geometric.nn import GCNConv, SAGEConv
 
 
-class SingleLayerGNN(th.nn.Module):
-    def __init__(self, in_channels, out_channels):
+class GNN_model(th.nn.Module):
+    def __init__(self, UE_feature_size, L):
         super().__init__()
-        self.conv = GCNConv(in_channels, out_channels)
-        self.linear = th.nn.Linear(in_channels + out_channels, out_channels)
+        self.L = L
+        self.bipartite = SAGEConv(UE_feature_size, 8, root_weight=False)
+        self.sameCPU = GCNConv(8, 8)
+        self.diffCPU = GCNConv(8, 8, add_self_loops=False)
+        self.linear = th.nn.Linear(8, 1)
+        self.sigmoid = th.nn.Sigmoid()
 
-    def forward(self, x, edge_index):
-        x = x.to(th.float)
-        edge_index = edge_index.to(th.int64)
+    def forward(self, G_sameCPU_graph, G_diffCPU_graph, UE_features, F_graph):
+        UE_features = UE_features.to(th.float)
+        G_sameCPU_graph = G_sameCPU_graph.to(th.int64)
+        G_diffCPU_graph = G_diffCPU_graph.to(th.int64)
+        F_graph = F_graph.to(th.int64)
 
-        # Apply GNN to the subgraph
-        embedding = F.relu(th.cat((x[0], self.conv(x, edge_index)[0]), dim=0))
+        AP_features = self.bipartite((UE_features, th.zeros((self.L, UE_features.size(1)))), F_graph)
 
-        # Get the AP assignment prediction
-        predicted_AP_assignment = self.linear(embedding)
+        sameCPU_embeddings = self.sameCPU(AP_features, G_sameCPU_graph)
+        diffCPU_embeddings = self.diffCPU(AP_features, G_diffCPU_graph)
+
+        embeddings = sameCPU_embeddings+diffCPU_embeddings
+
+        predicted_AP_assignment = self.sigmoid(self.linear(embeddings))
 
         return predicted_AP_assignment
 
 
 class SampleBuffer(object):
 
-    def __init__(self, batch_size, max_size=10000000):
+    def __init__(self, batch_size=1, max_size=10000000):
         self.storage = deque(maxlen=max_size)
         self.batch_size = batch_size
 
@@ -51,90 +60,55 @@ class SampleBuffer(object):
             self.storage = pickle.load(f)
 
 
-# Create a custom dataset class
-class MyGraphDataset(InMemoryDataset):
+class DualGraphDataset(Dataset):
+    def __init__(self, graphs, transform=None, pre_transform=None):
+        super().__init__()
+        self.data_list = graphs  # Store (undirected_graph, bipartite_graph) pairs
+        self.transform = transform
+        self.pre_transform = pre_transform
 
-    def __init__(self, root, graphs = list([])):
-        self.graphs = graphs
-        super().__init__(root)
+    def __len__(self):
+        return len(self.data_list)
 
-    def buffers2dataset(self, buffers, filepath):
-        # run over the buffers in the list
-        for buffer in buffers:
-            # run over the elements in the buffer
-            for sample in buffer.storage:
-                # convert the matrix of channel gains to a graph
-                graph = get_star_graph(sample[0].T, sample[1])
-                # Append the graph and its label to the dataset
-                self.graphs.append(graph)
-        th.save(self.graphs, filepath+'/AP_training_Dataset.pt')
+    def __getitem__(self, idx):
+        return self.data_list[idx]
 
-    @property
-    def processed_file_names(self):
-        return ['data.pt']
+    def add_sample(self, undirected_graph, bipartite_graph):
+        """Add a sample to the dataset."""
+        self.data_list.append((undirected_graph, bipartite_graph))
 
     def len(self):
-        return len(self.graphs)
-
-    def get(self, idx):
-        """
-        Retrieve a graph by index.
-        """
-        return self.graphs[idx]
+        return len(self.data_list)
 
 
-def get_star_graph(channelGain_matrix, AP_assignment):
-    ''''
-    This function takes the features matrix and returns the star graph.
-    The features matrix is a tensor of size (N, M) where N is the number of nodes (same as the number of relevant UEs)
-    and M is the number of features (same as the number of potential APs).
-    The star graph is a DGL graph with N nodes and N-1 edges.
+def custom_collate(data_list):
+    undirected_graphs = [d[0] for d in data_list]
+    bipartite_graphs = [d[1] for d in data_list]
+
+    # Use `torch_geometric.loader.DataLoader` for batching
+    batched_undirected = DataLoader(undirected_graphs, batch_size=len(undirected_graphs))
+    batched_bipartite = DataLoader(bipartite_graphs, batch_size=len(bipartite_graphs))
+
+    return batched_undirected, batched_bipartite
+
+
+def bipartitegraph_generation(F, R):
+    '''This function creates the edge list and feature matrix for the bipartite graph between APs and UEs
+    INPUT>
+    :param F: matrix with dimensions LxK where element (l,k) is '1' if AP L is one of the F preferred APs of UE k
+    :param R: matrix with dimensions N x N x L x K where (:,:,l,k) is the spatial correlation
+                            matrix between  AP l and UE k (normalized by noise variance)
+    OUTPUT>
+    edge_list: tensor with dimensions 2 x ... where the first row is the UE index and the second row is the AP index
+    feature_matrix: tensor with a NN feature for each UE node
     '''
 
-    # bring the last row of the feature matrix to the first row
-    featuresMatrix = th.tensor(np.roll(channelGain_matrix, 1, axis=0), dtype=th.cfloat)
+    F_graph = th.tensor(np.transpose(np.nonzero(F.T))).T
 
-    N = featuresMatrix.shape[0]
-    edge_list = th.stack((th.tensor(range(1, N)), th.zeros((N-1))))
+    F_graph_adapted = th.zeros((F_graph.shape[1], 2))
+    UE_features = th.zeros((F_graph.shape[1], R.shape[0]*R.shape[1]), dtype=th.cfloat)
+    for idx, k in enumerate(F_graph[0, :]):
+        F_graph_adapted[idx, :] = torch.tensor([idx, F_graph[1, idx]])
+        UE_features[idx, :] = torch.tensor(R[:, :, F_graph[1, idx], k].flatten())
 
-    return Data(x=featuresMatrix, edge_index=edge_list, y=th.tensor(AP_assignment))
-
-
-def get_AP2UE_edges(D):
-    ''''
-    This function takes the AP-UE assignment matrix and returns the list of edges.
-    Every row in the tensor UE2AP_edge_list represents an edge in the graph.
-    The first column is the AP index and the second column is the UE index.
-    '''
-
-    AP2UE_edges = th.tensor(np.transpose(np.nonzero(D)))
-
-    return AP2UE_edges
-
-
-def get_Pilot2UE_edges(pilotIndex):
-    ''''
-    This function takes the pilot allocation and returns the list of edges.
-    Every row in the tensor UE2AP_edge_list represents an edge in the graph.
-    The first column is the AP index and the second column is the UE index.
-    '''
-
-    Pilot2UE_edges = th.zeros((len(pilotIndex), 2))
-
-    for idx in range(len(pilotIndex)):
-        Pilot2UE_edges[idx, 0] = pilotIndex[idx]
-        Pilot2UE_edges[idx, 1] = idx
-
-    return Pilot2UE_edges
-
-
-def get_oneHot_bestPilot(best_pilot_sample, tau_p):
-    ''''
-    This function takes the best pilot allocation and returns the one-hot encoding of the best pilot.
-    '''
-
-    one_hot_best_pilot = th.zeros((tau_p))
-
-    one_hot_best_pilot[int(best_pilot_sample)] = 1
-
-    return one_hot_best_pilot
+    return F_graph_adapted.T, UE_features

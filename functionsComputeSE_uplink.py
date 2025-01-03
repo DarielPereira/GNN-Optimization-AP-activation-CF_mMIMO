@@ -64,10 +64,10 @@ def functionComputeSE_uplink(Hhat, H, D, AP_state, C, tau_c, tau_p, nbrOfRealiza
 
 
     # Prepare to store simulation results
-    SE_MMSE = np.zeros((K, 1), dtype=complex)
-    SE_P_MMSE = np.zeros((K, 1), dtype=complex)
-    SE_P_RZF = np.zeros((K, 1), dtype=complex)
-    SE_MR = np.zeros((K, 1), dtype=complex)
+    SE_MMSE = np.zeros((K, 1))
+    SE_P_MMSE = np.zeros((K, 1))
+    SE_P_RZF = np.zeros((K, 1))
+    SE_MR = np.zeros((K, 1))
 
     # Go through all channel realizations
     for n in range(nbrOfRealizations):

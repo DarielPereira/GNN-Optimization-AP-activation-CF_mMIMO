@@ -2,12 +2,17 @@ import numpy as np
 import numpy.linalg as alg
 import math
 from sklearn.cluster import KMeans
+import os
+
+# Set the environment variable to avoid memory leak warning
+os.environ['OMP_NUM_THREADS'] = '1'
 
 from functionsUtils import db2pow, localScatteringR, drawingSetup, drawing3Dvectors
 # from functionsClustering_PilotAlloc import pilotAssignment, drawPilotAssignment
 
 
-def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
+def generateSetup(L, K, N, T, cell_side, ASD_varphi, bool_testing,
+    seed = 0):
     """Generates realizations of the setup
     INPUT>
     :param L: number of APs
@@ -36,7 +41,9 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
     M: matrix with dimensions QxL where element (q,l) is '1' if AP l is connected to CPU q, and '0' otherwise
     """
 
-    np.random.seed(seed)
+    # Set the seed if in testing mode
+    if bool_testing:
+        np.random.seed(seed)
 
     # Simulation Setup Configuration Parameters
     squarelength = cell_side    # length of one side the coverage area in m
@@ -79,7 +86,7 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
 
         # Apply k-means clustering
         num_clusters = nbrOfCPUs  # Choose the number of clusters
-        kmeans = KMeans(n_clusters=num_clusters, random_state=0)
+        kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init=10)
         kmeans.fit(data)
 
         # Cluster centers and labels
@@ -108,8 +115,8 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
         # store the UE position
         UEpositions[k] = UEposition
 
-    # setup map
-    drawingSetup(UEpositions, APpositions, np.zeros((K), dtype=int), title="Setup Map", squarelength=squarelength)
+    # # setup map
+    # drawingSetup(UEpositions, APpositions, np.zeros((K), dtype=int), title="Setup Map", squarelength=squarelength)
 
 
     # Compute correlation matrices
@@ -126,4 +133,36 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, seed = 0):
 
     return gainOverNoisedB, distances, R, APpositions, UEpositions, M
 
+
+def get_F_G_matrices(gainOverNoisedB, L, K, f):
+    """Return the F matrix with dimensions LxK where element (l,k) is '1' if AP L is one of the F preferred APs of UE k
+    INPUT>
+    :param gainOverNoisedB: matrix with dimensions LxK where element (l,k) is the channel gain
+                            (normalized by noise variance) between AP l and UE k
+    :param L: number of APs
+    :param K: number of UEs
+    :param f: number of potential APs to be selected by each UE
+
+    OUTPUT>
+    F: matrix with dimensions LxK where element (l,k) is '1' if AP L is one of the F preferred APs of UE k
+    G: matrix with dimensions LxL where element (l,l') is '1' if APs l and l' have some UE in common
+    """
+
+    # Initialize the F and G matrices
+    F = np.zeros((L, K), dtype=int)
+    G = np.zeros((L, L), dtype=int)
+
+
+    # Go through all UEs
+    for k in range(K):
+        # Find the indices of the F largest elements
+        indices = np.argpartition(gainOverNoisedB[:, k], -f)[-f:]
+
+        # Set the corresponding elements in the F matrix to '1'
+        F[indices, k] = 1
+
+    # Compute the adjacency matrix for the only-AP graph
+    G[:] = F@F.T - np.diag(np.diag(F@F.T))
+
+    return F, G
 

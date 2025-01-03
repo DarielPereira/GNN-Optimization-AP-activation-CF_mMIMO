@@ -72,7 +72,7 @@ for setup_iter in range(nbrOfSetups):
 
     # Generate one setup with UEs and APs at random locations
     gainOverNoisedB, distances, R, APpositions, UEpositions, M = (
-        generateSetup(L, K, N, T, cell_side, ASD_varphi, seed=setup_iter+100))
+        generateSetup(L, K, N, T, cell_side, ASD_varphi, bool_testing=True,  seed=setup_iter+100))
 
     # Compute AP and pilot assignment
     pilotIndex = PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode='DCC')
