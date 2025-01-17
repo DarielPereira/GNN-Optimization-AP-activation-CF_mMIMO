@@ -1,8 +1,12 @@
 import numpy as np
 import itertools
+import torch as th
 
 from functionsUtils import db2pow, binary_combinations
 from functionsComputeSE_uplink import functionComputeSE_uplink
+from functionsSetup import get_F_G_matrices
+from functionsGraphHandling import bipartitegraph_generation
+from functionsGraphHandling import SampleBuffer, DualGraphDataset, custom_collate, GNN_model
 
 
 def PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode):
@@ -53,7 +57,7 @@ def PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode):
     return pilotIndex
 
 
-def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat, H, B, C, L, K, N, Q, M,
+def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat, H, B, C, L, K, N, Q, M, f,
                    comb_mode, heuristic_mode):
     """Use clustering information to assign pilots to the UEs. UEs in the same cluster should be assigned
     different pilots
@@ -687,6 +691,68 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
 
                 # Find the best AP state
                 best_APstate[M[c, :] == 1] = feasible_reduced_APstates[np.argmax(sum_SEs)]
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+        case 'GNN':
+
+            # Get the F matrix with preferred APs for each UE
+            F, G = get_F_G_matrices(gainOverNoisedB, L, K, f)
+
+            # Store the graph information
+            # Generate the list of edges in the graphs
+            G_sameCPU = np.zeros((L, L), dtype=int)
+            G_sameCPU_full = np.zeros((L, L), dtype=int)
+            for c in range(M.shape[0]):
+                G_sameCPU[np.where(M[c, :] == 1)[0], :] = G[np.where(M[c, :] == 1)[0], :] * M[c, :]
+                G_sameCPU_full[np.where(M[c, :] == 1)[0], :] = M[c, :]
+
+            G_sameCPU_full = G_sameCPU_full - np.identity(L)
+            G_diffCPU = G - G_sameCPU
+
+            G_sameCPU_graph = th.tensor(np.transpose(np.nonzero(G_sameCPU))).T
+            G_sameCPU_fullgraph = th.tensor(np.transpose(np.nonzero(G_sameCPU_full))).T
+            G_diffCPU_graph = th.tensor(np.transpose(np.nonzero(G_diffCPU))).T
+
+            F_graph, UE_features = bipartitegraph_generation(F, R)
+
+            # Create the GNN
+            GNN = GNN_model(UE_features.shape[1])
+            GNN.load_model(f'./AP_TrainingData/AP_trained_model_L_9_N_4_Q_3_T_5_f_5_taup_10_Samples_10_nonNorm.pt')
+
+            # Compute the prediction
+            GNN_output = GNN(G_sameCPU_fullgraph, G_diffCPU_graph,
+                                           UE_features, F_graph, L)
+
+            APs_probabilities = th.sigmoid(GNN_output).detach().numpy().flatten()
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            for c in range(M.shape[0]):
+                best_APstate[np.argsort((APs_probabilities*M[c,:]).flatten())[-Q:]] = 1
+
+            # D vector common to all the UEs
+            D = np.ones((L, K))
 
             # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
             SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,

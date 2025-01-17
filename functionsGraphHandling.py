@@ -10,31 +10,83 @@ from torch_geometric.nn import GCNConv, SAGEConv
 
 
 class GNN_model(th.nn.Module):
-    def __init__(self, UE_feature_size, L):
+    def __init__(self, UE_feature_size):
         super().__init__()
-        self.L = L
-        self.bipartite = SAGEConv(UE_feature_size, 8, root_weight=False)
-        self.sameCPU = GCNConv(8, 8)
-        self.diffCPU = GCNConv(8, 8, add_self_loops=False)
-        self.linear = th.nn.Linear(8, 1)
+        self.bipartite = SAGEConv(UE_feature_size, 24, root_weight=False)
+        self.sameCPU = GCNConv(24, 24, normalize = True, add_self_loops=False)
+        self.diffCPU = GCNConv(24, 24, normalize=True, add_self_loops=False)
+        self.linear = th.nn.Linear(72, 1)
         self.sigmoid = th.nn.Sigmoid()
 
-    def forward(self, G_sameCPU_graph, G_diffCPU_graph, UE_features, F_graph):
+    def forward(self, G_sameCPU_graph, G_diffCPU_graph, UE_features, F_graph, L):
         UE_features = UE_features.to(th.float)
         G_sameCPU_graph = G_sameCPU_graph.to(th.int64)
         G_diffCPU_graph = G_diffCPU_graph.to(th.int64)
         F_graph = F_graph.to(th.int64)
 
-        AP_features = self.bipartite((UE_features, th.zeros((self.L, UE_features.size(1)))), F_graph)
+        AP_features = self.bipartite((UE_features, th.zeros((L, UE_features.size(1)))), F_graph)
 
         sameCPU_embeddings = self.sameCPU(AP_features, G_sameCPU_graph)
         diffCPU_embeddings = self.diffCPU(AP_features, G_diffCPU_graph)
 
-        embeddings = sameCPU_embeddings+diffCPU_embeddings
+        embeddings = th.cat((AP_features, sameCPU_embeddings, diffCPU_embeddings), dim=1)
 
-        predicted_AP_assignment = self.sigmoid(self.linear(embeddings))
+        # predicted_AP_assignment = self.sigmoid(self.linear(embeddings))
+        predicted_AP_assignment = self.linear(embeddings)
 
         return predicted_AP_assignment
+
+    def model_train(self, train_loader, optimizer, loss_fn):
+        self.train()
+        total_loss = 0
+        counter = 1
+        for batch in train_loader:
+            print(f'Batch {counter}/{len(train_loader)}')
+            counter += 1
+
+            optimizer.zero_grad()
+
+            batched_undirected, batched_bipartite = batch
+
+            # Compute the prediction
+            predicted_AP_assignment = self(batched_undirected.full_sameCPU_edge, batched_undirected.diffCPU_edge,
+                                           batched_bipartite.x, batched_bipartite.edge_index,
+                                           L =  batched_undirected.y.size(0))
+
+            loss = loss_fn(predicted_AP_assignment.flatten(), batched_undirected.y)
+            loss.backward()
+            optimizer.step()
+
+            total_loss += loss.item()
+
+        return total_loss / len(train_loader)
+
+    def model_validate(self, val_loader, loss_fn):
+        self.eval()
+        total_loss = 0
+        with th.no_grad():
+            for batch in val_loader:
+                batched_undirected, batched_bipartite = batch
+
+                # Compute the prediction
+                predicted_AP_assignment = self(batched_undirected.full_sameCPU_edge, batched_undirected.diffCPU_edge,
+                                               batched_bipartite.x, batched_bipartite.edge_index,
+                                               L =  batched_undirected.y.size(0))
+
+                loss = loss_fn(predicted_AP_assignment.flatten(), batched_undirected.y)
+                total_loss += loss.item()
+
+        return total_loss / len(val_loader)
+
+    def save_model(self, file_path):
+        th.save(self.state_dict(), file_path)
+        print(f'Model saved to {file_path}')
+
+    def load_model(self, file_path):
+        self.load_state_dict(th.load(file_path))
+        self.eval()
+        print(f'Model loaded from {file_path}')
+
 
 
 class SampleBuffer(object):
@@ -112,3 +164,4 @@ def bipartitegraph_generation(F, R):
         UE_features[idx, :] = torch.tensor(R[:, :, F_graph[1, idx], k].flatten())
 
     return F_graph_adapted.T, UE_features
+

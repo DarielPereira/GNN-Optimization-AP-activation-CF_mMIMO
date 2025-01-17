@@ -9,25 +9,26 @@ from datetime import datetime
 from functionsAllocation import PilotAssignment, AP_OnOff_GlobalHeuristics
 from functionsSetup import generateSetup, get_F_G_matrices
 from functionsChannelEstimates import channelEstimates
-from functionsGraphHandling import SampleBuffer, bipartitegraph_generation
+from functionsGraphHandling import SampleBuffer, bipartitegraph_generation, DualGraphDataset
+from torch_geometric.data import Data
 
 ##Setting Parameters
 configuration = {
-    'nbrOfSetups': 30000,             # number of communication network setups
-    'nbrOfConnectedUEs_range': [3, 7],            # number of UEs to insert
+    'nbrOfSetups': 16000,             # number of communication network setups
+    'nbrOfConnectedUEs_range': [2, 4],            # number of UEs to insert
     'nbrOfRealizations': 5,      # number of channel realizations per sample
-    'L': 16,                     # number of APs
+    'L': 9,                     # number of APs
     'N': 4,                       # number of antennas per AP
-    'Q': 1,                       # max number of APs served by each CPU
-    'T': 2,                       # number of APs connected to each CPU
+    'Q': 3,                       # max number of APs served by each CPU
+    'T': 5,                       # number of APs connected to each CPU
     'tau_c': 100,                 # length of the coherence block
     'tau_p': 10,                  # length of the pilot sequences
     'p': 100,                     # uplink transmit power per UE in mW
-    'cell_side': 300,            # side of the square cell in m
+    'cell_side': 200,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
     'potentialAPs_mode': 'F_highestChannelGain', # mode used to select the potential APs
-    'f': 3,                        # number of potential APs to be selected by each UE
+    'f': 5,                        # number of potential APs to be selected by each UE
     'bool_testing': False,           # set to 'True' to enable testing mode
     'heuristic_mode': 'exhaustive_search'   # heuristic mode used to solve the optimization
 
@@ -89,7 +90,7 @@ for setup_iter in range(nbrOfSetups):
 
     best_APstate, best_sum_SE, best_SEs = AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p,
                                                                     tau_c, Hhat,
-                                                                    H, B, C, L, K, N, Q, M,
+                                                                    H, B, C, L, K, N, Q, M, f,
                                                                     comb_mode, heuristic_mode)
 
     # Store the setup information
@@ -98,31 +99,45 @@ for setup_iter in range(nbrOfSetups):
     # Store the graph information
     # Generate the list of edges in the graphs
     G_sameCPU = np.zeros((L, L), dtype=int)
+    G_sameCPU_full = np.zeros((L, L), dtype=int)
     for c in range(M.shape[0]):
         G_sameCPU[np.where(M[c, :] == 1)[0], :] = G[np.where(M[c, :] == 1)[0], :] * M[c, :]
+        G_sameCPU_full[np.where(M[c, :] == 1)[0], :] = M[c, :]
 
+    G_sameCPU_full = G_sameCPU_full - np.identity(L)
     G_diffCPU = G - G_sameCPU
 
     G_sameCPU_graph = th.tensor(np.transpose(np.nonzero(G_sameCPU))).T
+    G_sameCPU_fullgraph = th.tensor(np.transpose(np.nonzero(G_sameCPU_full))).T
     G_diffCPU_graph = th.tensor(np.transpose(np.nonzero(G_diffCPU))).T
 
     F_graph, UE_features = bipartitegraph_generation(F, R)
 
-    graphBuffer.add([G_sameCPU_graph, G_diffCPU_graph, F_graph, UE_features, best_APstate])
+    graphBuffer.add([G_sameCPU_graph, G_sameCPU_fullgraph, G_diffCPU_graph, F_graph, UE_features, best_APstate])
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-# Save the setup buffer
+# # Save the setup buffer
+# file_name = (
+# f'./AP_TRAININGDATA/newData/SetupBuffer_Comb_'
+# +comb_mode+f'_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(setupsBuffer.storage)}_'+timestamp+'.pkl')
+#
+# setupsBuffer.save(file_name)
+
+# Create the data set to store the graphs
+dataset = DualGraphDataset(graphs = [])
+
+# Load the information from the buffer to the dataset
+for sample in graphBuffer.storage:
+    G_graph = Data(sameCPU_edge=sample[0], full_sameCPU_edge=sample[1], diffCPU_edge=sample[2],
+                   y=th.tensor(sample[5], dtype=th.float))
+    F_graph = Data(edge_index=sample[3], x=sample[4])
+    dataset.add_sample(G_graph, F_graph)
+
 file_name = (
-f'./AP_TRAININGDATA/newData/SetupBuffer_Comb_'
-+comb_mode+f'_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(setupsBuffer.storage)}_'+timestamp+'.pkl')
+f'./AP_TrainingData/AP_training_Dataset_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(graphBuffer.storage)}_'+timestamp+'.pt')
 
-setupsBuffer.save(file_name)
+# Save the data set
+th.save(dataset.data_list, file_name)
 
-# Save the graph buffer
-file_name = (
-f'./AP_TRAININGDATA/newData/GraphTrainingBuffer_Comb_'
-+comb_mode+f'_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(graphBuffer.storage)}_'+timestamp+'.pkl')
-
-graphBuffer.save(file_name)
 

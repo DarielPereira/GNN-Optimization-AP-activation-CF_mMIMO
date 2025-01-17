@@ -22,16 +22,17 @@ configuration = {
     'N': 4,                       # number of antennas per AP
     'Q': 4,                       # max number of APs served by each CPU
     'T': 8,                       # number of APs connected to each CPU
+    'f': 5,                        # number of potential APs to be selected by each UE
     'tau_c': 400,                 # length of the coherence block
     'tau_p': 150,                  # length of the pilot sequences
     'p': 100,                     # uplink transmit power per UE in mW
     'cell_side': 1000,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
-    'heuristic_mode': 'bestgains_individualAPs'   # heuristic mode used to solve the optimization
+    'heuristic_mode': 'GNN'   # heuristic mode used to solve the optimization
                                             # ['exhaustive_search', 'sequential_greedy', 'best_individualAPs',
                                             # 'local_ES', 'local_SG', 'Q_random', 'successive_local_SG',
-                                            # 'successive_local_ES', 'bestgains_individualAPs']
+                                            # 'successive_local_ES', 'bestgains_individualAPs', 'GNN']
     }
 
 print('### CONFIGURATION PARAMETERS ###')
@@ -46,6 +47,7 @@ L = configuration['L']
 N = configuration['N']
 Q = configuration['Q']
 T = configuration['T']
+f = configuration['f']
 tau_c = configuration['tau_c']
 tau_p = configuration['tau_p']
 p = configuration['p']
@@ -81,7 +83,7 @@ for setup_iter in range(nbrOfSetups):
     Hhat, H, B, C = channelEstimates(R, nbrOfRealizations, L, K, N, tau_p, pilotIndex, p)
 
     best_APstate, best_sum_SE, best_SEs = AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat,
-                                             H, B, C, L, K, N, Q, M,
+                                             H, B, C, L, K, N, Q, M, f,
                    comb_mode, heuristic_mode)
 
 
