@@ -7,19 +7,22 @@ import pickle
 
 from torch_geometric.data import Dataset, Data, DataLoader
 from torch_geometric.nn import GCNConv, SAGEConv
+from functionsUtils import db2pow
+from tqdm import tqdm
 
 
 class GNN_model(th.nn.Module):
     def __init__(self, UE_feature_size):
         super().__init__()
-        self.bipartite = SAGEConv(UE_feature_size, 24, root_weight=False)
-        self.sameCPU = GCNConv(24, 24, normalize = True, add_self_loops=False)
-        self.diffCPU = GCNConv(24, 24, normalize=True, add_self_loops=False)
-        self.linear = th.nn.Linear(72, 1)
+        self.bipartite = SAGEConv(2*UE_feature_size, 48, root_weight=False, aggr='sum')
+        self.sameCPU = GCNConv(48, 48, normalize = False, add_self_loops=False)
+        self.diffCPU = GCNConv(48, 48, normalize = False, add_self_loops=False)
+        self.linear1 = th.nn.Linear(144, 100)
+        self.linear2 = th.nn.Linear(100, 1)
         self.sigmoid = th.nn.Sigmoid()
 
     def forward(self, G_sameCPU_graph, G_diffCPU_graph, UE_features, F_graph, L):
-        UE_features = UE_features.to(th.float)
+        UE_features = th.cat((UE_features.real, UE_features.imag), dim=1).to(th.float)
         G_sameCPU_graph = G_sameCPU_graph.to(th.int64)
         G_diffCPU_graph = G_diffCPU_graph.to(th.int64)
         F_graph = F_graph.to(th.int64)
@@ -32,32 +35,32 @@ class GNN_model(th.nn.Module):
         embeddings = th.cat((AP_features, sameCPU_embeddings, diffCPU_embeddings), dim=1)
 
         # predicted_AP_assignment = self.sigmoid(self.linear(embeddings))
-        predicted_AP_assignment = self.linear(embeddings)
+        predicted_AP_assignment = th.nn.functional.relu(self.linear1(embeddings))
+        predicted_AP_assignment = self.linear2(predicted_AP_assignment)
 
         return predicted_AP_assignment
 
     def model_train(self, train_loader, optimizer, loss_fn):
         self.train()
         total_loss = 0
-        counter = 1
-        for batch in train_loader:
-            print(f'Batch {counter}/{len(train_loader)}')
-            counter += 1
+        with tqdm(total=len(train_loader), desc="Training", unit="batch") as pbar:
+            for batch in train_loader:
+                optimizer.zero_grad()
 
-            optimizer.zero_grad()
+                batched_undirected, batched_bipartite = batch
 
-            batched_undirected, batched_bipartite = batch
+                # Compute the prediction
+                predicted_AP_assignment = self(batched_undirected.full_sameCPU_edge, batched_undirected.diffCPU_edge,
+                                               batched_bipartite.x, batched_bipartite.edge_index,
+                                               L =  batched_undirected.y.size(0))
 
-            # Compute the prediction
-            predicted_AP_assignment = self(batched_undirected.full_sameCPU_edge, batched_undirected.diffCPU_edge,
-                                           batched_bipartite.x, batched_bipartite.edge_index,
-                                           L =  batched_undirected.y.size(0))
+                loss = loss_fn(predicted_AP_assignment.flatten(), batched_undirected.y)
+                loss.backward()
+                optimizer.step()
 
-            loss = loss_fn(predicted_AP_assignment.flatten(), batched_undirected.y)
-            loss.backward()
-            optimizer.step()
-
-            total_loss += loss.item()
+                total_loss += loss.item()
+                pbar.update(1)
+                pbar.set_postfix(loss=loss.item())
 
         return total_loss / len(train_loader)
 
@@ -113,11 +116,12 @@ class SampleBuffer(object):
 
 
 class DualGraphDataset(Dataset):
-    def __init__(self, graphs, transform=None, pre_transform=None):
+    def __init__(self, graphs = None, transform=None, pre_transform=None):
         super().__init__()
         self.data_list = graphs  # Store (undirected_graph, bipartite_graph) pairs
         self.transform = transform
         self.pre_transform = pre_transform
+        self.parameters = {}
 
     def __len__(self):
         return len(self.data_list)
@@ -132,6 +136,23 @@ class DualGraphDataset(Dataset):
     def len(self):
         return len(self.data_list)
 
+    def combine(self, origen_filenames, destination_filename):
+         for file in origen_filenames:
+            other_dataset = th.load(file)
+            self.data_list += other_dataset
+
+         th.save(self.data_list, destination_filename)
+
+    def save(self, file_path):
+        th.save({'data_list': self.data_list, 'parameters': self.parameters}, file_path)
+        print(f'Dataset and parameters saved to {file_path}')
+
+    def load(self, file_path):
+        data = th.load(file_path)
+        self.data_list = data['data_list']
+        self.parameters = data['parameters']
+        print(f'Dataset and parameters loaded from {file_path}')
+
 
 def custom_collate(data_list):
     undirected_graphs = [d[0] for d in data_list]
@@ -144,7 +165,7 @@ def custom_collate(data_list):
     return batched_undirected, batched_bipartite
 
 
-def bipartitegraph_generation(F, R):
+def bipartitegraph_generation(F, R, gainOverNoisedB):
     '''This function creates the edge list and feature matrix for the bipartite graph between APs and UEs
     INPUT>
     :param F: matrix with dimensions LxK where element (l,k) is '1' if AP L is one of the F preferred APs of UE k
@@ -162,6 +183,8 @@ def bipartitegraph_generation(F, R):
     for idx, k in enumerate(F_graph[0, :]):
         F_graph_adapted[idx, :] = torch.tensor([idx, F_graph[1, idx]])
         UE_features[idx, :] = torch.tensor(R[:, :, F_graph[1, idx], k].flatten())
+
+    UE_features = UE_features / db2pow(np.max(gainOverNoisedB))
 
     return F_graph_adapted.T, UE_features
 

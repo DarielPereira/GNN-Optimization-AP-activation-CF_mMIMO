@@ -6,7 +6,7 @@ from functionsUtils import db2pow, binary_combinations
 from functionsComputeSE_uplink import functionComputeSE_uplink
 from functionsSetup import get_F_G_matrices
 from functionsGraphHandling import bipartitegraph_generation
-from functionsGraphHandling import SampleBuffer, DualGraphDataset, custom_collate, GNN_model
+from functionsGraphHandling import GNN_model
 
 
 def PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode):
@@ -733,11 +733,11 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
             G_sameCPU_fullgraph = th.tensor(np.transpose(np.nonzero(G_sameCPU_full))).T
             G_diffCPU_graph = th.tensor(np.transpose(np.nonzero(G_diffCPU))).T
 
-            F_graph, UE_features = bipartitegraph_generation(F, R)
+            F_graph, UE_features = bipartitegraph_generation(F, R, gainOverNoisedB)
 
             # Create the GNN
             GNN = GNN_model(UE_features.shape[1])
-            GNN.load_model(f'./AP_TrainingData/AP_trained_model_L_9_N_4_Q_3_T_5_f_5_taup_10_Samples_10_nonNorm.pt')
+            GNN.load_model(f'./AP_TrainingData/Model_L_12_N_4_Q_2_T_4_f_5_K_(6_10)_taup_100_NbrSamp_20000_Epochs_7_SAGEConv_sum.pt')
 
             # Compute the prediction
             GNN_output = GNN(G_sameCPU_fullgraph, G_diffCPU_graph,

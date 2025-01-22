@@ -58,14 +58,24 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, bool_testing,
     distanceVertical = 10       # height difference between the APs and the UEs in meters
     antennaSpacing = 0.5        # half-wavelength distance
 
-    AP_spacing = squarelength/(L**0.5)
+    # Set the number of APs to be a square number (if not already)
+    if L**0.5 % 1 != 0:
+        L_ = math.ceil(L**0.5)**2
+    else:
+        L_ = L
+
+    AP_spacing = squarelength/(L_**0.5)
 
     # Regular AP deployment
     APpositions = []
-    for i in np.linspace(AP_spacing/2, squarelength - AP_spacing/2, int(L**0.5)):
-        for j in np.linspace(AP_spacing/2, squarelength - AP_spacing/2, int(L**0.5)):
+    for i in np.linspace(AP_spacing/2, squarelength - AP_spacing/2, int(L_**0.5)):
+        for j in np.linspace(AP_spacing/2, squarelength - AP_spacing/2, int(L_**0.5)):
             APpositions.append(complex(i, j) + complex((squarelength/50)*np.random.randn(1)[0], (squarelength/50)*np.random.randn(1)[0]))
     APpositions = np.array(APpositions).reshape(-1, 1)
+
+    # Remove additional APs
+    idx_remove = np.random.choice(range(L_), L_-L, replace=False)
+    APpositions = np.delete(APpositions, idx_remove, axis=0)
 
     # M matrix stores the connections between the APs and the CPUs
     nbrOfCPUs = math.ceil(L / T)

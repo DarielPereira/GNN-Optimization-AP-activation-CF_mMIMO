@@ -20,16 +20,16 @@ configuration = {
     'nbrOfRealizations': 2,      # number of channel realizations per sample
     'L': 100,                     # number of APs
     'N': 4,                       # number of antennas per AP
-    'Q': 4,                       # max number of APs served by each CPU
-    'T': 8,                       # number of APs connected to each CPU
-    'f': 5,                        # number of potential APs to be selected by each UE
+    'Q': 3,                       # max number of APs served by each CPU
+    'T': 5,                       # number of APs connected to each CPU
+    'f': 3,                        # number of potential APs to be selected by each UE
     'tau_c': 400,                 # length of the coherence block
-    'tau_p': 150,                  # length of the pilot sequences
+    'tau_p': 100,                  # length of the pilot sequences
     'p': 100,                     # uplink transmit power per UE in mW
     'cell_side': 1000,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
-    'heuristic_mode': 'GNN'   # heuristic mode used to solve the optimization
+    'heuristic_mode': 'Q_random'   # heuristic mode used to solve the optimization
                                             # ['exhaustive_search', 'sequential_greedy', 'best_individualAPs',
                                             # 'local_ES', 'local_SG', 'Q_random', 'successive_local_SG',
                                             # 'successive_local_ES', 'bestgains_individualAPs', 'GNN']
