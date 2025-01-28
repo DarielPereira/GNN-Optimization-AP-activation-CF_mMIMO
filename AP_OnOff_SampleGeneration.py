@@ -35,7 +35,8 @@ configuration = {
     'potentialAPs_mode': 'F_highestChannelGain', # mode used to select the potential APs
     'f': 5,                        # number of potential APs to be selected by each UE
     'bool_testing': False,           # set to 'True' to enable testing mode
-    'heuristic_mode': 'exhaustive_search'   # heuristic mode used to solve the optimization
+    'heuristic_mode': 'exhaustive_search',   # heuristic mode used to solve the optimization
+    'GNN_mode': 'Gains'           # mode used to generate the GNN input
 }
 
 print('### CONFIGURATION PARAMETERS ###')
@@ -60,6 +61,7 @@ potentialAPs_mode = configuration['potentialAPs_mode']
 f = configuration['f']
 bool_testing = configuration['bool_testing']
 heuristic_mode = configuration['heuristic_mode']
+GNN_mode = configuration['GNN_mode']
 
 # Create the sample storage buffer
 setupsBuffer = SampleBuffer()
@@ -95,10 +97,7 @@ for setup_iter in tqdm(range(nbrOfSetups), desc="Generating Setups", unit="setup
     best_APstate, best_sum_SE, best_SEs = AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p,
                                                                     tau_c, Hhat,
                                                                     H, B, C, L, K, N, Q, M, f,
-                                                                    comb_mode, heuristic_mode)
-
-    # Store the setup information
-    setupsBuffer.add([R, F, G, best_APstate])
+                                                                    comb_mode, heuristic_mode, GNN_mode)
 
     # Store the graph information
     # Generate the list of edges in the graphs
@@ -115,18 +114,11 @@ for setup_iter in tqdm(range(nbrOfSetups), desc="Generating Setups", unit="setup
     G_sameCPU_fullgraph = th.tensor(np.transpose(np.nonzero(G_sameCPU_full))).T
     G_diffCPU_graph = th.tensor(np.transpose(np.nonzero(G_diffCPU))).T
 
-    F_graph, UE_features = bipartitegraph_generation(F, R, gainOverNoisedB)
+    F_graph, UE_features = bipartitegraph_generation(F, R, gainOverNoisedB, GNN_mode)
 
     graphBuffer.add([G_sameCPU_graph, G_sameCPU_fullgraph, G_diffCPU_graph, F_graph, UE_features, best_APstate])
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-# # Save the setup buffer
-# file_name = (
-# f'./AP_TRAININGDATA/newData/SetupBuffer_Comb_'
-# +comb_mode+f'_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(setupsBuffer.storage)}_'+timestamp+'.pkl')
-#
-# setupsBuffer.save(file_name)
 
 # Create the data set to store the graphs
 dataset = DualGraphDataset(graphs = [])
@@ -140,7 +132,8 @@ for sample in graphBuffer.storage:
     dataset.add_sample(G_graph, F_graph)
 
 file_name = (
-f'./AP_TrainingData/Dataset_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(graphBuffer.storage)}.pt')
+f'./AP_TrainingData/'+GNN_mode+
+f'/Dataset_L_{L}_N_{N}_Q_{Q}_T_{T}_f_{f}_taup_{tau_p}_NbrSamp_{len(graphBuffer.storage)}.pt')
 
 # Save the data set
 dataset.save(file_name)

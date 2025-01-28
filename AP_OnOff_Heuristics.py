@@ -20,19 +20,21 @@ configuration = {
     'nbrOfRealizations': 2,      # number of channel realizations per sample
     'L': 100,                     # number of APs
     'N': 4,                       # number of antennas per AP
-    'Q': 3,                       # max number of APs served by each CPU
-    'T': 5,                       # number of APs connected to each CPU
-    'f': 3,                        # number of potential APs to be selected by each UE
+    'Q': 4,                       # max number of APs served by each CPU
+    'T': 8,                       # number of APs connected to each CPU
+    'f': 1,                        # number of potential APs to be selected by each UE
     'tau_c': 400,                 # length of the coherence block
     'tau_p': 100,                  # length of the pilot sequences
     'p': 100,                     # uplink transmit power per UE in mW
     'cell_side': 1000,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
-    'heuristic_mode': 'Q_random'   # heuristic mode used to solve the optimization
+    'heuristic_mode': 'GNN',   # heuristic mode used to solve the optimization
                                             # ['exhaustive_search', 'sequential_greedy', 'best_individualAPs',
                                             # 'local_ES', 'local_SG', 'Q_random', 'successive_local_SG',
                                             # 'successive_local_ES', 'bestgains_individualAPs', 'GNN']
+    'GNN_mode': 'CorrMat'           # mode used to generate the GNN input
+                                            # ['CorrMat', 'Gains']
     }
 
 print('### CONFIGURATION PARAMETERS ###')
@@ -55,6 +57,7 @@ cell_side = configuration['cell_side']
 ASD_varphi = configuration['ASD_varphi']
 comb_mode = configuration['comb_mode']
 heuristic_mode = configuration['heuristic_mode']
+GNN_mode = configuration['GNN_mode']
 
 # To store the sum-SE values for each setup
 sum_SEs = np.zeros(nbrOfSetups)
@@ -84,7 +87,7 @@ for setup_iter in range(nbrOfSetups):
 
     best_APstate, best_sum_SE, best_SEs = AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat,
                                              H, B, C, L, K, N, Q, M, f,
-                   comb_mode, heuristic_mode)
+                   comb_mode, heuristic_mode, GNN_mode)
 
 
     # Print the results

@@ -6,7 +6,7 @@ from functionsUtils import db2pow, binary_combinations
 from functionsComputeSE_uplink import functionComputeSE_uplink
 from functionsSetup import get_F_G_matrices
 from functionsGraphHandling import bipartitegraph_generation
-from functionsGraphHandling import GNN_model
+from functionsGraphHandling import GNN_CorrMat, GNN_Gains
 
 
 def PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode):
@@ -58,7 +58,7 @@ def PilotAssignment(R, gainOverNoisedB, tau_p, L, K, N, mode):
 
 
 def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, tau_c, Hhat, H, B, C, L, K, N, Q, M, f,
-                   comb_mode, heuristic_mode):
+                   comb_mode, heuristic_mode, GNN_mode):
     """Use clustering information to assign pilots to the UEs. UEs in the same cluster should be assigned
     different pilots
     INPUT>
@@ -733,11 +733,19 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
             G_sameCPU_fullgraph = th.tensor(np.transpose(np.nonzero(G_sameCPU_full))).T
             G_diffCPU_graph = th.tensor(np.transpose(np.nonzero(G_diffCPU))).T
 
-            F_graph, UE_features = bipartitegraph_generation(F, R, gainOverNoisedB)
+            F_graph, UE_features = bipartitegraph_generation(F, R, gainOverNoisedB, GNN_mode)
 
             # Create the GNN
-            GNN = GNN_model(UE_features.shape[1])
-            GNN.load_model(f'./AP_TrainingData/Model_L_12_N_4_Q_2_T_4_f_5_K_(6_10)_taup_100_NbrSamp_20000_Epochs_7_SAGEConv_sum.pt')
+            match GNN_mode:
+                case 'CorrMat':
+                    GNN = GNN_CorrMat(UE_features.shape[1])
+                case 'Gains':
+                    GNN = GNN_Gains(UE_features.shape[1])
+                case _:
+                    raise ValueError('ERROR: GNN mode mismatching')
+
+            GNN.load_model(f'./AP_TrainingData/' + GNN_mode +
+                           '/Model_L_12_N_4_Q_2_T_4_f_5_K_(6_10)_taup_100_NbrSamp_20000_Epochs_7_SAGEConv_sum.pt')
 
             # Compute the prediction
             GNN_output = GNN(G_sameCPU_fullgraph, G_diffCPU_graph,

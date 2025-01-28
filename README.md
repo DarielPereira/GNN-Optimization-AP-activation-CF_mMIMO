@@ -52,13 +52,31 @@
             # The AP_TrainingData folder includes the datasets and models evaluated in this stage.
             # The ResultsMediumSetups.xlsx file includes the results of the evaluation of the GNN models.
 
+        # Some results: training performs very good, both training and validation data tend to low values of BCE loss. 
+            However, although the trained model is competitive with the best heuristics, it is not able to outperform 
+            them. The best guess is that the training samples fail to capture the actual complexity of the global 
+            problem >> this problem holds and we are do not know yet how to solve it. Same problem happens to the
+            GNN-gains model.
+            
+    # 20250128:
+        # Added:
+            # We update all the scripts to include the calls to the Gain-based GNN model.
+            # We update the functionsGraphHandling.py script. Now, we have a parent class for the GNN models, and
+            two child classes, one for the GNN model based on the correlation matrices and another for the GNN model 
+            based on the average channel gains. 
+            # In the folder AP_TrainingData, we have independent datasets and models for each GNN type. 
 
+        # Some results: the GNN-gains achieves a competitive perfomance in both evaluation scenarios (T=4,Q=2 and T=8,Q=4).
+        However, it achieves the best performance for the less trainined version of the model, that is, the model trained
+        over only 7 epochs. Besides, the best performance is achieved when using f=1. Do not know how to justify.
 
+    
     # To do:
         # Adapt the system model for the AP on/off optimization problem (Done).
         # Implement the sequential greedy AP on/off (Done).
         # Study the independece of the AP on/off. Is sequential always optimal? -> NO (Done).
         # Test the training of the GNNs for the AP on/off task -> In process...
+        # Modify the generation of the training samples to try to represent better the global networks -> In process...
 
 
 
