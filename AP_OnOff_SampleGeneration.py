@@ -36,7 +36,7 @@ configuration = {
     'f': 5,                        # number of potential APs to be selected by each UE
     'bool_testing': False,           # set to 'True' to enable testing mode
     'heuristic_mode': 'exhaustive_search',   # heuristic mode used to solve the optimization
-    'GNN_mode': 'Gains'           # mode used to generate the GNN input
+    'GNN_mode': 'Gains',           # mode used to generate the GNN input ['CorrMat', 'Gains']
 }
 
 print('### CONFIGURATION PARAMETERS ###')

@@ -7,8 +7,8 @@ from functionsGraphHandling import SampleBuffer, DualGraphDataset, custom_collat
 from torch_geometric.loader import DataLoader
 from torch_geometric.data import Data
 
-dataConfiguration = 'L_12_N_4_Q_2_T_4_f_5_taup_100_NbrSamp_20000'
-GNN_mode = 'Gains'
+dataConfiguration = 'L_12_N_4_Q_2_T_4_f_5_K_(6_10)_taup_100_NbrSamp_20000'
+GNN_mode = 'CorrMat' # 'CorrMat' or 'Gains'
 
 dataset_directory = f'./AP_TrainingData/'+GNN_mode+'/Dataset_'+dataConfiguration
 model_directory = f'./AP_TrainingData/'+GNN_mode+'/Model_'+dataConfiguration

@@ -70,15 +70,19 @@
         However, it achieves the best performance for the less trainined version of the model, that is, the model trained
         over only 7 epochs. Besides, the best performance is achieved when using f=1. Do not know how to justify.
 
-    
+    # 20250305:
+        # Added:
+            # The script AP_training_self_supervised.py was created and moved to the files of discarded scripts (__Unused).
+            Self-supervised training cannot be implemented because the objective functions is not continuos or desrivable 
+            with respecto the network parameters.
+
+
     # To do:
         # Adapt the system model for the AP on/off optimization problem (Done).
         # Implement the sequential greedy AP on/off (Done).
         # Study the independece of the AP on/off. Is sequential always optimal? -> NO (Done).
         # Test the training of the GNNs for the AP on/off task -> In process...
         # Modify the generation of the training samples to try to represent better the global networks -> In process...
-
-
 
 
  

@@ -126,9 +126,6 @@ class GNN_Gains(GNN_model):
         return predicted_AP_assignment
 
 
-
-
-
 class SampleBuffer(object):
 
     def __init__(self, batch_size=1, max_size=10000000):
@@ -227,7 +224,6 @@ def bipartitegraph_generation(F, R, gainOverNoisedB, GNN_mode):
             UE_features = UE_features / db2pow(np.max(gainOverNoisedB))
 
         case 'CorrMat':
-
             UE_features = th.zeros((F_graph.shape[1], R.shape[0]*R.shape[1]), dtype=th.cfloat)
             for idx, k in enumerate(F_graph[0, :]):
                 F_graph_adapted[idx, :] = torch.tensor([idx, F_graph[1, idx]])
