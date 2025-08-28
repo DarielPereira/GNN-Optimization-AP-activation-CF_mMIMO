@@ -1,4 +1,7 @@
-### This script generates and stores the setups' buffer from where the training samples are later generated
+"""
+This script generates and stores the setups' buffer from where the training samples are later generated.
+"""
+
 import os
 
 # Set the environment variable to avoid memory leak

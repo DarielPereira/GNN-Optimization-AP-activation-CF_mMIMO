@@ -1,3 +1,7 @@
+"""
+This script generates the data for the plots of sum-SE when considering different number of UEs.
+"""
+
 import numpy as np
 import math
 

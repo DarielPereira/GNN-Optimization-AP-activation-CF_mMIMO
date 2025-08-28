@@ -1,3 +1,7 @@
+"""
+This module contains utility functions for wireless communication simulations. It includes functions for drawing setups.
+"""
+
 import numpy as np
 import numpy.linalg as alg
 import math

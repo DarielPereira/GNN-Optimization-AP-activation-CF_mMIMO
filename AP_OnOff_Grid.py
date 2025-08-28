@@ -1,3 +1,10 @@
+"""
+This script generates a grid of the sum SE achieved by a UE traversing the network for two different approaches:
+1) Fixed approach: A single combination of active APs is selected randomly and used for all the positions evaluated for
+the UE.
+2) Pixel-based approach: For each position of the UE, a combination of active APs is selected.
+"""
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -68,7 +75,7 @@ for idxi, i in enumerate(range(0, 200, 10)):
                                                                         gainOverNoisedB, tau_p,
                                                                         tau_c, Hhat,
                                                                         H, B, C, L, K, N, Q, M, f,
-                                                                        comb_mode= 'MMSE', heuristic_mode= 'local_ES',
+                                                                        comb_mode= 'MMSE', heuristic_mode= 'GNN',
                                                                         GNN_mode= 'Gains')
 
         Grid_SE_pixelbased[idxj, idxi] = best_sum_SE

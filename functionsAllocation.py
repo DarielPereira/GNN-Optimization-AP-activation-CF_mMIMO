@@ -1,3 +1,8 @@
+"""
+This script contains functions for pilot assignment and AP on/off strategies
+"""
+
+
 import numpy as np
 import itertools
 import torch as th

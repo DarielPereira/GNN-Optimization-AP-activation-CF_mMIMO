@@ -1,3 +1,7 @@
+"""
+This script is intended to test different AP On/Off algorithms in a cell-free massive MIMO network.
+"""
+
 import math
 
 from sympy.matrices.expressions.factorizations import QofQR

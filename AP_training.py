@@ -1,3 +1,7 @@
+"""
+This script implements the training of a Graph Neural Network (GNN) to optimize the activation of Access Points (APs)
+"""
+
 import os
 import torch as th
 import glob

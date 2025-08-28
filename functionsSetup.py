@@ -1,3 +1,7 @@
+"""
+This script contains functions to generate the simulation setup for a cell-free massive MIMO network.
+"""
+
 import numpy as np
 import numpy.linalg as alg
 import math

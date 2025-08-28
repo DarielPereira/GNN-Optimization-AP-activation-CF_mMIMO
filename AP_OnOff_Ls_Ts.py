@@ -1,3 +1,8 @@
+"""
+This script generates the data for the plots of sum-SE when considering different number of APs and different values
+of average number of APs per router.
+"""
+
 import numpy as np
 import math
 

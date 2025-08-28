@@ -1,3 +1,8 @@
+"""
+This module contains classes and functions for handling graph-based data structures. It includes implementations of
+Graph Neural Network (GNN) models.
+"""
+
 import torch
 import torch as th
 from collections import deque

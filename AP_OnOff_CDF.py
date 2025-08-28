@@ -1,3 +1,7 @@
+"""
+This script generates the data for the CDF plots of the SE per UE when different AP On/Off algorithms are used.
+"""
+
 import numpy as np
 import math
 
@@ -79,6 +83,6 @@ for idx, configuration in enumerate(configurations):
 
             results[algorithm][idx, iter * K:(iter+1) * K] = best_SEs[:]
 
-
+# Saving the results    NOTE: /GRAPHs/VARIABLES_SAVED/ path must be created in case it does not exist
 file_name = f'./GRAPHs/VARIABLES_SAVED/SE_CDF_K_{K}_NbrSetps_{nbrOfSetups}_L_100_N_4.pkl'
 save_results(results, file_name)

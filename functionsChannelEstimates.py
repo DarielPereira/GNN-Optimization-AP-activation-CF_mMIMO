@@ -1,3 +1,7 @@
+"""
+This function generates the channel realizations and estimations of these channels for all the UEs in the entire network.
+"""
+
 import numpy
 import numpy as np
 import numpy.linalg as alg
