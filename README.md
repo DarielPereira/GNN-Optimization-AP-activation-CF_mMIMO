@@ -1,4 +1,71 @@
-# AP on/off sum-rate optimization for cell-free massive MIMO communications with limited fronthaul capacity
+# GNN-based Optimization of sum-SE in Cell-Free Massive MIMO Communications with Limited Fronthaul Capacity
+
+This project implements a framework for optimizing the activation of Access Points (APs) in cell-free massive MIMO 
+systems with limited fronthaul capacity. The optimization is tested using heuristic methods and Graph Neural Networks (GNNs).
+
+See details in the paper:
+- **Title**: Pixel-Based CF-mMIMO: Addressing the AP Cooperation Cluster Formation in Fronthaul-Limited O-RAN Architectures
+- **Authors**: Dariel Pereira Ruisánchez, Michael Joham, Óscar Fresnedo, Darian Pérez Adán, Luis Castedo, and Wolfgang Utschick
+- **URL**: https://www.authorea.com/users/683174/articles/1322673-pixel-based-cf-mmimo-addressing-the-ap-cooperation-cluster-formation-in-fronthaul-limited-o-ran-architectures
+
+---
+
+## Project Structure
+
+### Main Files and Scripts
+
+- **`AP_OnOff_{}.py, {CDF,Grid,Ks,Ls_Ts}`**
+  This files generate the results for the AP on/off optimization problem using different setups. The placeholders 
+`{CDF,Grid,Ks,Ls_Ts}` indicate different configurations:
+
+- **`AP_OnOff_SampleGeneration.py`**  
+  Generates training samples for the GNN models. It creates datasets with graph-related information for the AP on/off task.
+
+- **`AP_training.py`**  
+  This script implements the training of a Graph Neural Network (GNN) to optimize the activation of Access Points (APs)
+
+- **`functionsGraphHandling.py`**  
+  This module contains classes and functions for handling graph-based data structures. It includes implementations of
+Graph Neural Network (GNN) models.
+
+- **`functionsSetup.py`**  
+  Generates the system setup, including AP and UE positions, channel realizations, and other parameters.
+
+- **`functionsAPAllocation.py`**  
+  Implements heuristic methods for pilot allocation and AP on/off configuration.
+
+- **`AP_OnOff_Heuristics.py`**  
+  Calls the heuristic methods for AP on/off optimization.
+
+- **`functionsUtils.py`**  
+  Provides utility functions for loading results, saving data, and other general-purpose tasks.
+
+- **`README.md`**  
+  This file provides an overview of the project, its structure, and usage instructions.
+
+---
+
+## Libraries Used
+
+The project relies on the following Python libraries:
+
+- **`torch`**: For building and training the GNN models.
+- **`torch_geometric`**: For handling graph data and implementing graph-based neural networks.
+- **`numpy`**: For numerical computations.
+- **`matplotlib`**: For plotting and visualizing results.
+- **`tqdm`**: For progress bars during data generation and training.
+- **`random`**: For generating random setups and seeds.
+
+---
+
+
+## Recommended use
+-  Generate training samples using AP_OnOff_SampleGeneration.py.
+-  Train the GNN models using AP_training.py.
+-  Evaluate the models using the heuristic methods in AP_OnOff_Heuristics.py or AP_OnOff_{} scripts for 
+different network configurations.
+
+---
 
 ## Versions:
     # 20241129: 
@@ -85,32 +152,4 @@
         # Modify the generation of the training samples to try to represent better the global networks -> In process...
 
 
- 
 
-## Getting Started
-
-Download links:
-
-SSH clone URL: ssh://git@git.jetbrains.space/gtec/drl-sch/Cell-Free.git
-
-HTTPS clone URL: https://git.jetbrains.space/gtec/drl-sch/Cell-Free.git
-
-
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
-## Prerequisites
-
-What things you need to install the software and how to install them.
-
-```
-Examples
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a production system.
-
-## Resources
-
-Add links to external resources for this project, such as CI server, bug tracker, etc.
