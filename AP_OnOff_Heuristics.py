@@ -29,11 +29,11 @@ configuration = {
     'cell_side': 1000,            # side of the square cell in m
     'ASD_varphi': math.radians(10),         # Azimuth angle - Angular Standard Deviation in the local scattering model
     'comb_mode': 'MMSE',           # combining method used to evaluate optimization
-    'heuristic_mode': 'GNN',   # heuristic mode used to solve the optimization
+    'heuristic_mode': 'successive_local_SG',   # heuristic mode used to solve the optimization
                                             # ['exhaustive_search', 'sequential_greedy', 'best_individualAPs',
                                             # 'local_ES', 'local_SG', 'Q_random', 'successive_local_SG',
                                             # 'successive_local_ES', 'bestgains_individualAPs', 'GNN']
-    'GNN_mode': 'CorrMat'           # mode used to generate the GNN input
+    'GNN_mode': 'Gains'           # mode used to generate the GNN input
                                             # ['CorrMat', 'Gains']
     }
 
@@ -71,7 +71,7 @@ for setup_iter in range(nbrOfSetups):
     # sample the number of connected UEs from a uniform distribution in the specified range (nbrOfConnectedUEs_range)
     # random.seed(setup_iter+nbrOfSetups)
     # K = random.randint(nbrOfConnectedUEs_range[0], nbrOfConnectedUEs_range[1])
-    K = 50
+    K = 300
 
     print(f'Generating setup {setup_iter+1}/{nbrOfSetups} with {K} connected UEs......')
 

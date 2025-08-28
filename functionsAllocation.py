@@ -541,6 +541,58 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
             best_sum_SE = np.sum(SE)
             best_SEs = SE.flatten()
 
+        case 'fixed':
+
+            np.random.seed(1)
+
+            # To store the best AP state
+            best_APstate = np.zeros((L))
+
+            # Run over the CPUs
+            for c in range(M.shape[0]):
+                # Get the APs connected to the CPU c
+                connected_APs = np.where(M[c, :] == 1)[0]
+
+                # Randomly select Q APs
+                selected_APs = np.random.choice(connected_APs, min(Q, len(connected_APs)), replace=False)
+
+                # Update the best AP state
+                best_APstate[selected_APs] = 1
+
+            # Check if the best AP state is valid
+            valid = True
+            for idx in range(M.shape[0]):
+                if M[idx, :] @ best_APstate > Q:
+                    valid = False
+
+            if not valid:
+                print('ERROR: Invalid AP state')
+
+            # D vector common to all the UEs
+            D = np.ones((L, K))
+
+            # Compute SE for centralized and distributed uplink operations for the case when all APs serve all the UEs
+            SE_MMSE, SE_P_RZF, SE_MR, SE_P_MMSE = functionComputeSE_uplink(Hhat, H, D, best_APstate, C, tau_c,
+                                                                           tau_p,
+                                                                           nbrOfRealizations, N, K, L, p)
+
+            match comb_mode:
+                case 'MMSE':
+                    SE = SE_MMSE
+                case 'P_RZF':
+                    SE = SE_P_RZF
+                case 'MR':
+                    SE = SE_MR
+                case 'P_MMSE':
+                    SE = SE_P_MMSE
+                case _:
+                    print('ERROR: Combining mode mismatching')
+                    SE = 0
+
+            best_sum_SE = np.sum(SE)
+            best_SEs = SE.flatten()
+
+
         case 'successive_local_SG':
 
             # To store the best AP state
@@ -745,7 +797,7 @@ def AP_OnOff_GlobalHeuristics(p, nbrOfRealizations, R, gainOverNoisedB, tau_p, t
                     raise ValueError('ERROR: GNN mode mismatching')
 
             GNN.load_model(f'./AP_TrainingData/' + GNN_mode +
-                           '/Model_L_12_N_4_Q_2_T_4_f_5_K_(6_10)_taup_100_NbrSamp_20000_Epochs_7_SAGEConv_sum.pt')
+                           '/Model_L_12_N_4_Q_2_T_4_f_5_taup_100_NbrSamp_20000_Epochs_7_SAGEConv_sum.pt')
 
             # Compute the prediction
             GNN_output = GNN(G_sameCPU_fullgraph, G_diffCPU_graph,

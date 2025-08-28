@@ -33,7 +33,7 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, bool_testing,
     APpositions: matrix of dimensions Lx1 containing the APs' locations as complex numbers,
                         where the real part is the horizontal position and the imaginary part is the
                         vertical position
-    UEpositions: matrix of dimensions Lx1 containing the UEs' locations as complex numbers,
+    UEpositions: matrix of dimensions Kx1 containing the UEs' locations as complex numbers,
                         where the real part is the horizontal position and the imaginary part is the
                         vertical position
     distances: matrix of dimensions LxK where element (l,k) is the distance en meters between
@@ -82,7 +82,7 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, bool_testing,
     M = np.zeros((nbrOfCPUs, L), dtype=int)
 
     # Clustering mode
-    clusteringMode = 'Kbeams'
+    clusteringMode = 'Kmeans'
 
     if clusteringMode == 'sequential':
         for i in range(nbrOfCPUs):
@@ -90,7 +90,7 @@ def generateSetup(L, K, N, T, cell_side, ASD_varphi, bool_testing,
                 if (j) // T == i:
                     M[i, j] = 1
 
-    elif clusteringMode == 'Kbeams':
+    elif clusteringMode == 'Kmeans':
         # Convert complex numbers to 2D (real and imaginary parts)
         data = np.column_stack((APpositions.real, APpositions.imag))
 
