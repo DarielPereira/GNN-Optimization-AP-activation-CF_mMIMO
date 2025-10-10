@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="549f4e48-2651-4db0-b935-7e0af79cc7de" name="Changes" comment="20250306">
+      <change afterPath="$PROJECT_DIR$/AP_OnOff_CDF.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AP_OnOff_Grid.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AP_OnOff_Ks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GRAPHs/Graph_SE_Grid.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GRAPHs/Graph_SE_Ks.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GRAPHs/Graph_SEs_CDF_multisetup.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/cfMIMO_AP_ONOFF_20241129.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/cfMIMO_AP_ONOFF_20241129.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AP_OnOff_Heuristics.py" beforeDir="false" afterPath="$PROJECT_DIR$/AP_OnOff_Heuristics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/BarGraphs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/BarGraphs.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/Graph_SEs_CDF.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/Graph_SEs_CDF.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/SEs_CDF__.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SEs_CDF__.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Comb_MR_NbrSetups_1.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Comb_MR_NbrSetups_1.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Comb_MR_NbrSetups_10.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Comb_MR_NbrSetups_10.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Comb_MR_NbrSetups_2.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Comb_MR_NbrSetups_2.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Comb_MR_NbrSetups_4.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Comb_MR_NbrSetups_4.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Update_allUEs_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Update_allUEs_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Update_allUEs_local_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Update_allUEs_local_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Update_newUE_CSI_imperfect_NbrSetups_1_NbrUEs_10.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Update_newUE_CSI_imperfect_NbrSetups_1_NbrUEs_10.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Update_newUE_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Update_newUE_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Update_newUE_CSI_imperfect_NbrSetups_5_NbrUEs_10.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Update_newUE_CSI_imperfect_NbrSetups_5_NbrUEs_10.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/SE_CDF_Update_newUE_local_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/GRAPHs/VARIABLES_SAVED/Unused/SE_CDF_Update_newUE_local_CSI_imperfect_NbrSetups_1_NbrUEs_4.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ResultsMediumSetups.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionsAllocation.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionsAllocation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionsSetup.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionsSetup.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="20250304_Self_supervised_Training" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;DarielPereira&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/DarielPereira/cfMIMO_AP_ONOFF.git&quot;,
+    &quot;accountId&quot;: &quot;ee23e543-bab2-4d8c-a192-b109b55549ef&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2pWTxf6vj1XAXbCwJ9A8yvx3gFN" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="sortByType" value="true" />
+    <option name="sortKey" value="BY_TYPE" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.AP_OnOff_Grid.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.AP_OnOff_Heuristics (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.AP_OnOff_Heuristics.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.AP_OnOff_Ks.executor&quot;: &quot;Run&quot;,
+    &quot;Python.AP_OnOff_SampleGeneration.executor&quot;: &quot;Run&quot;,
+    &quot;Python.AP_training.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.AP_trainingFixed.executor&quot;: &quot;Run&quot;,
+    &quot;Python.AP_training_self_supervised.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.functionsAllocation.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.functionsGraphHandling.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.functionsSetup.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/druis/OneDrive - Universidade da Coruña/PONENCIAS/47.ICC25_CFootprints_PilotAssignment_CFmMIMO (OK)/Code/cfMIMO_Clustering_20240608&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129" />
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\AP_TrainingData" />
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\GRAPHs" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\__Unused" />
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\AP_TrainingData\CorrMat" />
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\AP_TrainingData\UnusedDataSets_2" />
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\AP_TrainingData" />
+      <recent name="C:\Users\druis\OneDrive - Universidade da Coruña\PONENCIAS\50.GNNs_PilotAPs\Code\cfMIMO_AP_ONOFF_20241129\AP_TrainingData\UnusedDataSets" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.AP_OnOff_Ks">
+    <configuration name="AP_OnOff_Grid" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cfMIMO_AP_ONOFF_20241129" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AP_OnOff_Grid.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="AP_OnOff_Heuristics" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cfMIMO_AP_ONOFF_20241129" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AP_OnOff_Heuristics.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="AP_OnOff_Heuristics" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cfMIMO_AP_ONOFF_20241129" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AP_OnOff_Heuristics.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="AP_OnOff_Ks" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cfMIMO_AP_ONOFF_20241129" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AP_OnOff_Ks.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="functionsAllocation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cfMIMO_AP_ONOFF_20241129" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/functionsAllocation.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="functionsGraphHandling" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cfMIMO_AP_ONOFF_20241129" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/functionsGraphHandling.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.AP_OnOff_Ks" />
+      <item itemvalue="Python.AP_OnOff_Grid" />
+      <item itemvalue="Python.functionsAllocation" />
+      <item itemvalue="Python.AP_OnOff_Heuristics" />
+      <item itemvalue="Python.functionsGraphHandling" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.AP_OnOff_Ks" />
+        <item itemvalue="Python.AP_OnOff_Grid" />
+        <item itemvalue="Python.AP_OnOff_Heuristics" />
+        <item itemvalue="Python.functionsGraphHandling" />
+        <item itemvalue="Python.functionsAllocation" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102" />
+        <option value="bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="549f4e48-2651-4db0-b935-7e0af79cc7de" name="Changes" comment="" />
+      <created>1732881080308</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732881080308</updated>
+      <workItem from="1732881081448" duration="10033000" />
+      <workItem from="1733130709568" duration="44464000" />
+      <workItem from="1733478766135" duration="68350000" />
+      <workItem from="1734091504262" duration="6237000" />
+      <workItem from="1734167151851" duration="15196000" />
+      <workItem from="1734339404271" duration="76548000" />
+      <workItem from="1735923736617" duration="4720000" />
+      <workItem from="1736339396919" duration="17000" />
+      <workItem from="1736847182478" duration="17029000" />
+      <workItem from="1736931484808" duration="10531000" />
+      <workItem from="1736949031689" duration="483000" />
+      <workItem from="1736949526646" duration="18863000" />
+      <workItem from="1737108441669" duration="85000" />
+      <workItem from="1737108550852" duration="10063000" />
+      <workItem from="1737126036482" duration="95409000" />
+      <workItem from="1737969379525" duration="22552000" />
+      <workItem from="1738069445322" duration="1987000" />
+      <workItem from="1738072864199" duration="182000" />
+      <workItem from="1740744376598" duration="373000" />
+      <workItem from="1740745037701" duration="14380000" />
+      <workItem from="1741172455186" duration="20055000" />
+      <workItem from="1741612750614" duration="18917000" />
+      <workItem from="1745620830666" duration="2819000" />
+      <workItem from="1746437493258" duration="11057000" />
+      <workItem from="1746863688161" duration="8674000" />
+      <workItem from="1747037529141" duration="5604000" />
+    </task>
+    <task id="LOCAL-00001" summary="20241129">
+      <option name="closed" value="true" />
+      <created>1732891262139</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1732891262139</updated>
+    </task>
+    <task id="LOCAL-00002" summary="20241212">
+      <option name="closed" value="true" />
+      <created>1734003366786</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1734003366786</updated>
+    </task>
+    <task id="LOCAL-00003" summary="20241219">
+      <option name="closed" value="true" />
+      <created>1734600811749</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1734600811749</updated>
+    </task>
+    <task id="LOCAL-00004" summary="20241220">
+      <option name="closed" value="true" />
+      <created>1735922607725</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1735922607725</updated>
+    </task>
+    <task id="LOCAL-00005" summary="20250117_temp">
+      <option name="closed" value="true" />
+      <created>1737108703367</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1737108703367</updated>
+    </task>
+    <task id="LOCAL-00006" summary="20250122">
+      <option name="closed" value="true" />
+      <created>1737549917611</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737549917611</updated>
+    </task>
+    <task id="LOCAL-00007" summary="20250123">
+      <option name="closed" value="true" />
+      <created>1737550458593</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1737550458593</updated>
+    </task>
+    <task id="LOCAL-00008" summary="20250123">
+      <option name="closed" value="true" />
+      <created>1737550777367</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1737550777367</updated>
+    </task>
+    <task id="LOCAL-00009" summary="20250122">
+      <option name="closed" value="true" />
+      <created>1737550839363</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1737550839363</updated>
+    </task>
+    <task id="LOCAL-00010" summary="20250128">
+      <option name="closed" value="true" />
+      <created>1738058931699</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1738058931699</updated>
+    </task>
+    <task id="LOCAL-00011" summary="20250306">
+      <option name="closed" value="true" />
+      <created>1741254005478</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1741254005478</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="20250304_Self_supervised_Training" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="20241129" />
+    <MESSAGE value="20241212" />
+    <MESSAGE value="20241219" />
+    <MESSAGE value="20241220" />
+    <MESSAGE value="20250117_temp" />
+    <MESSAGE value="20250123" />
+    <MESSAGE value="20250122" />
+    <MESSAGE value="20250128" />
+    <MESSAGE value="20250306" />
+    <option name="LAST_COMMIT_MESSAGE" value="20250306" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/functionsAllocation.py</url>
+          <line>403</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/functionsAllocation.py</url>
+          <line>327</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/functionsAllocation.py</url>
+          <line>221</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/functionsAllocation.py</url>
+          <line>463</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/functionsAllocation.py</url>
+          <line>496</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/functionsAllocation.py</url>
+          <line>792</line>
+          <option name="timeStamp" value="115" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/AP_OnOff_Grid.py</url>
+          <line>29</line>
+          <option name="timeStamp" value="116" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/functionsAllocation.py" line="180">
+        <watch expression="best_sum_SE" />
+      </inline-watch>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$functionsAllocation.coverage" NAME="functionsAllocation Coverage Results" MODIFIED="1737029405911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$functionsGraphHandling.coverage" NAME="functionsGraphHandling Coverage Results" MODIFIED="1737971279498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$functionsSetup.coverage" NAME="functionsSetup Coverage Results" MODIFIED="1734341373651" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_OnOff_Heuristics__1_.coverage" NAME="AP_OnOff_Heuristics (1) Coverage Results" MODIFIED="1737028662650" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_OnOff_Grid.coverage" NAME="AP_OnOff_Grid Coverage Results" MODIFIED="1746537800204" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_OnOff_Heuristics.coverage" NAME="AP_OnOff_Heuristics Coverage Results" MODIFIED="1746438123082" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_OnOff_SampleGeneration.coverage" NAME="AP_OnOff_SampleGeneration Coverage Results" MODIFIED="1737981972131" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_training.coverage" NAME="AP_training Coverage Results" MODIFIED="1741084653845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_trainingFixed.coverage" NAME="AP_trainingFixed Coverage Results" MODIFIED="1736949448910" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_training_self_supervised.coverage" NAME="AP_training_self_supervised Coverage Results" MODIFIED="1741087418482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cfMIMO_AP_ONOFF_20241129$AP_OnOff_Ks.coverage" NAME="AP_OnOff_Ks Coverage Results" MODIFIED="1747038762851" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

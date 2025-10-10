@@ -23,6 +23,17 @@ def db2pow(dB):
     pow = 10**(dB/10)
     return pow
 
+def pow2db(pow):
+    """Return the dB value corresponding to the input power
+    INPUT>
+    :param pow: power value
+    OUTPUT>
+    dB: dB value
+    """
+    dB = 10 * np.log10(pow)
+    return dB
+
+
 def localScatteringR(N, nominalAngle, ASD=math.radians(5), antennaSpacing=0.5):
     """return the approximate spatial correlation matrix for the local scattering model
     INPUT>

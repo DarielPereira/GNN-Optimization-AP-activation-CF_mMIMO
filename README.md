@@ -143,13 +143,16 @@ different network configurations.
             Self-supervised training cannot be implemented because the objective functions is not continuos or desrivable 
             with respecto the network parameters.
 
-
+    # 20251010:
+        # Added:
+            # We added the AP_OnOff_EstimationErrors.py script to evaluate the performance of the AP on/off methods
+            in setups where the large-scale fading values are imperfectly estimated.
+            # We added the script Graph_SE_EstimationErrors.py to generate the graphs for the setups with imperfect 
+            estimation. We haven't used a notebook becasue of issues with latex rendering.
     # To do:
         # Adapt the system model for the AP on/off optimization problem (Done).
         # Implement the sequential greedy AP on/off (Done).
         # Study the independece of the AP on/off. Is sequential always optimal? -> NO (Done).
-        # Test the training of the GNNs for the AP on/off task -> In process...
-        # Modify the generation of the training samples to try to represent better the global networks -> In process...
 
 
 
