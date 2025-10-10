@@ -16,7 +16,7 @@ See details in the paper:
 
 - **`AP_OnOff_{}.py, {CDF,Grid,Ks,Ls_Ts}`**
   This files generate the results for the AP on/off optimization problem using different setups. The placeholders 
-`{CDF,Grid,Ks,Ls_Ts}` indicate different configurations:
+`{CDF,Grid,Ks,Ls_Ts}` indicate different configurations.
 
 - **`AP_OnOff_SampleGeneration.py`**  
   Generates training samples for the GNN models. It creates datasets with graph-related information for the AP on/off task.
